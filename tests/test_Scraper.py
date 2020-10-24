@@ -55,7 +55,7 @@ class TestDriverWithBadInputs(unittest.TestCase):
             scraper.quit()
 
     def test_should_get_mad_if_no_keys_in_selector(self):
-        scraper = Scraper("https://www.mtgtop8.com/format?f=ST")
+        scraper = Scraper(URL)
         with self.assertRaises(NoSuchElementException):
             scraper.get_by_selector("table.NotATable")
         scraper.quit()

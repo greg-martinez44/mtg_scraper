@@ -24,9 +24,6 @@ class Scraper:
     def get_by_selector(self, selector):
         return self.driver.find_element_by_css_selector(selector)
 
-    def get_by_selectors(self, selectors):
-        return self.driver.find_elements_by_css_selectors(selectors)
-
     def execute(self, script, argument):
         self.driver.execute_script(f"{script}({argument});")
 
@@ -39,5 +36,8 @@ class ElementSelector(Scraper):
         super().__init__()
         self.selector = selector
 
-    def get_first(self):
-        return self
+    def get_first_by_css(self):
+        return self.driver.find_element_by_css_selector(selector)
+
+    def get_all_by_css(self):
+        return self.driver.find_elements_by_css_selector(selector)
