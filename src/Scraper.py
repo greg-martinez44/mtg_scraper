@@ -18,10 +18,6 @@ class Scraper:
     def quit(self):
         self.driver.quit()
 
-    def click(self, page_number):
-        self.driver.execute_script(f"PageSubmit({page_number});")
-        time.sleep(1)
-
     def get_page_source(self):
         return self.driver.page_source
 
