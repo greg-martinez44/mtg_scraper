@@ -32,3 +32,12 @@ class Scraper:
 
     def close(self):
         self.driver.close()
+
+class ElementSelector(Scraper):
+
+    def __init__(self, selector):
+        super().__init__()
+        self.selector = selector
+
+    def get_first(self):
+        return self
