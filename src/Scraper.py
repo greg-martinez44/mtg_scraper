@@ -19,7 +19,9 @@ class Scraper:
 
     def get_by(self, element_type, selector, get_all=True):
         selector = create_selector(self.driver, element_type, selector)
-        return selector.get_first()
+        if not get_all:
+            return selector.get_first()
+        return selector.get_all()
 
     def execute(self, script, argument):
         self.driver.execute_script(f"{script}({argument});")
@@ -51,3 +53,4 @@ class SelectorCSS(Selector):
 def create_selector(driver, element_type, selector):
     if element_type == "css":
         return SelectorCSS(driver, selector)
+    return None

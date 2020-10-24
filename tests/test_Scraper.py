@@ -1,10 +1,10 @@
 import unittest
+
 from selenium import webdriver
 from selenium.common.exceptions import (
     InvalidArgumentException, 
     NoSuchElementException
 )
-import time
 
 from src.Scraper import Scraper
 
@@ -33,7 +33,8 @@ class TestDriver(unittest.TestCase):
         page_source = self.scraper.get_page_source()
         stable = self.scraper.get_by("css", "table.Stable")
         self.assertIn("Nav_PN_no", page_source)
-        self.assertIn("PageSubmit(2)", page_source)
+        self.assertIn(f"PageSubmit({page})", page_source)
+        self.assertIsNotNone(stable)
 
     def test_get_button_to_go_to_page_two(self):
         self.scraper.execute("PageSubmit", 2)
@@ -42,12 +43,11 @@ class TestDriver(unittest.TestCase):
 
     def test_first_page_should_have_this_event_title(self):
         event_title = "Artisan ! @ Lotus eSports"
-        self.assertIn(event_title, self.scraper.get_page_source())
 
     def tearDown(self):
         self.scraper.quit()
 
-class TestDriverWithBadInputs(unittest.TestCase):
+class TestDriverWithBadInputsDefaultExceptions(unittest.TestCase):
 
     def test_should_return_with_empty_page(self):
         with self.assertRaises(InvalidArgumentException):
@@ -63,7 +63,10 @@ class TestDriverWithBadInputs(unittest.TestCase):
 class TestGettingSpecificElements(unittest.TestCase):
     def setUp(self):
         self.scraper = Scraper(URL)
-        self.page_source = self.scraper.get_page_source()
+
+    def test_should_give_all_paragraph_elements(self):
+        p_elements = self.scraper.get_by("css", "table.Stable")
+        self.assertTrue(len(p_elements) > 1)
 
     def tearDown(self):
         self.scraper.quit()
