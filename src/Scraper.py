@@ -31,14 +31,25 @@ class Scraper:
         self.driver.close()
 
 
-class ElementSelector(Scraper):
+class Selector:
+
+    def __init__(self, driver):
+        self.driver = driver
+
+    def get_first(self):
+        pass
+    
+    def get_all(self):
+        pass
+
+class CSS_Selector(Selector):
 
     def __init__(self, selector):
         super().__init__()
         self.selector = selector
 
-    def get_first_by_css(self):
+    def get_first(self):
         return self.driver.find_element_by_css_selector(selector)
 
-    def get_all_by_css(self):
+    def get_all(self):
         return self.driver.find_elements_by_css_selector(selector)
