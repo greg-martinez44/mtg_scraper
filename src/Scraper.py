@@ -22,7 +22,7 @@ class Scraper:
         return self.driver.page_source
 
     def get_by(self, selector):
-        return self.driver.find_element_by_css_selector(selector)
+        return CSS_Selector(self.driver, selector).get_first()
 
     def execute(self, script, argument):
         self.driver.execute_script(f"{script}({argument});")
@@ -44,12 +44,12 @@ class Selector:
 
 class CSS_Selector(Selector):
 
-    def __init__(self, selector):
-        super().__init__()
+    def __init__(self, driver, selector):
+        super().__init__(driver)
         self.selector = selector
 
     def get_first(self):
-        return self.driver.find_element_by_css_selector(selector)
+        return self.driver.find_element_by_css_selector(self.selector)
 
     def get_all(self):
-        return self.driver.find_elements_by_css_selector(selector)
+        return self.driver.find_elements_by_css_selector(self.selector)
