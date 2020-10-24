@@ -9,6 +9,10 @@ def create_selector(driver, element_type, selector):
         return SelectorCSS(driver, selector)
     if element_type == "name":
         return SelectorName(driver, selector)
+    if element_type == "id":
+        return SelectorID(driver, selector)
+    if element_type == "class":
+        return SelectorClass(driver, selector)
     return None
 
 
@@ -22,8 +26,9 @@ def _check_result(func):
 
 
 class Selector:
-    def __init__(self, driver):
+    def __init__(self, driver, selector):
         self.driver = driver
+        self.selector = selector
 
     def get_first(self):
         pass
@@ -34,8 +39,7 @@ class Selector:
 
 class SelectorCSS(Selector):
     def __init__(self, driver, selector):
-        super().__init__(driver)
-        self.selector = selector
+        super().__init__(driver, selector)
 
     @_check_result
     def get_first(self):
@@ -47,8 +51,7 @@ class SelectorCSS(Selector):
 
 class SelectorName(Selector):
     def __init__(self, driver, selector):
-        super().__init__(driver)
-        self.selector = selector
+        super().__init__(driver, selector)
 
     @_check_result
     def get_first(self):
@@ -56,3 +59,26 @@ class SelectorName(Selector):
 
     def get_all(self):
         return self.driver.find_elements_by_name(self.selector)
+
+class SelectorID(Selector):
+    def __init__(self, driver, selector):
+        super().__init__(driver, selector)
+    
+    @_check_result
+    def get_first(self):
+        return self.driver.find_element_by_id(self.selector)
+    
+    def get_all(self):
+        return self.driver.find_elements_by_id(self.selector)
+
+class SelectorClass(Selector):
+
+    def __init__(self, driver, selector):
+        super().__init__(driver, selector)
+
+    @_check_result
+    def get_first(self):
+        return self.driver.find_element_by_class_name(self.selector)
+
+    def get_all(self):
+        return self.driver.find_elements_by_class_name(self.selector)

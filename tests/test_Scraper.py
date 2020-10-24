@@ -54,8 +54,6 @@ class TestDriver(unittest.TestCase):
         self.scraper.quit()
 
 # Skipping because it is gumming up the webdriver access...
-
-
 @unittest.SkipTest
 class TestDriverWithBadInputsDefaultExceptions(unittest.TestCase):
 
@@ -85,6 +83,11 @@ class TestGettingSpecificElements(unittest.TestCase):
     def test_should_give_first_table_with_class_stable(self):
         table_element = self.scraper.get_by("css", "table.Stable")
         self.assertEqual(len(table_element), 1)
+
+    def test_finding_one_thing_by_name(self):
+        result = self.scraper.get_by("name", "meta")
+        self.assertEqual(len(result), 1)
+        self.assertIsInstance(result, list)
 
     def tearDown(self):
         self.scraper.quit()
