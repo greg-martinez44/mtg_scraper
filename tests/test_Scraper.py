@@ -5,6 +5,11 @@ from selenium.common.exceptions import (
     InvalidArgumentException, 
     NoSuchElementException
 )
+"""
+Hold for future? If not used, DELETE
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.ui import WebDriverWait
+"""
 
 from src.Scraper import Scraper
 
@@ -56,15 +61,18 @@ class TestDriverWithBadInputsDefaultExceptions(unittest.TestCase):
 
     def test_should_get_mad_if_no_keys_in_selector(self):
         scraper = Scraper(URL)
-        with self.assertRaises(NoSuchElementException):
-            scraper.get_by("css", "table.NotATable")
+        # with self.assertRaises(NoSuchElementException):
+        #     scraper.get_by("css", "table.NotATable")
+        #     scraper.quit()
+        result = scraper.get_by("css", "table.NotATable", get_all=False)
+        self.assertFalse(result)
         scraper.quit()
 
 class TestGettingSpecificElements(unittest.TestCase):
     def setUp(self):
         self.scraper = Scraper(URL)
 
-    def test_should_give_all_paragraph_elements(self):
+    def test_should_give_all_tables_with_class_Stable(self):
         p_elements = self.scraper.get_by("css", "table.Stable")
         self.assertTrue(len(p_elements) > 1)
 
