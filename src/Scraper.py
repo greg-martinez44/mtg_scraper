@@ -1,7 +1,3 @@
-import time
-import requests
-import pandas as pd
-from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
@@ -21,8 +17,9 @@ class Scraper:
     def get_page_source(self):
         return self.driver.page_source
 
-    def get_by(self, selector):
-        return CSS_Selector(self.driver, selector).get_first()
+    def get_by(self, element_type, selector, get_all=True):
+        selector = create_selector(self.driver, element_type, selector)
+        return selector.get_first()
 
     def execute(self, script, argument):
         self.driver.execute_script(f"{script}({argument});")
@@ -32,18 +29,15 @@ class Scraper:
 
 
 class Selector:
-
     def __init__(self, driver):
         self.driver = driver
-
     def get_first(self):
         pass
-    
     def get_all(self):
         pass
 
-class CSS_Selector(Selector):
 
+class SelectorCSS(Selector):
     def __init__(self, driver, selector):
         super().__init__(driver)
         self.selector = selector
@@ -53,3 +47,7 @@ class CSS_Selector(Selector):
 
     def get_all(self):
         return self.driver.find_elements_by_css_selector(self.selector)
+
+def create_selector(driver, element_type, selector):
+    if element_type == "css":
+        return SelectorCSS(driver, selector)

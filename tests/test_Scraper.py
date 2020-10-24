@@ -31,13 +31,13 @@ class TestDriver(unittest.TestCase):
     def test_is_page_one_with_no_previous_button(self):
         page = 2
         page_source = self.scraper.get_page_source()
-        stable = self.scraper.get_by("table.Stable")
+        stable = self.scraper.get_by("css", "table.Stable")
         self.assertIn("Nav_PN_no", page_source)
         self.assertIn("PageSubmit(2)", page_source)
 
     def test_get_button_to_go_to_page_two(self):
         self.scraper.execute("PageSubmit", 2)
-        stable = self.scraper.get_by("table.Stable")
+        stable = self.scraper.get_by("css", "table.Stable")
         self.assertNotIn("Nav_PN_no", stable.text)
 
     def test_first_page_should_have_this_event_title(self):
@@ -57,7 +57,7 @@ class TestDriverWithBadInputs(unittest.TestCase):
     def test_should_get_mad_if_no_keys_in_selector(self):
         scraper = Scraper(URL)
         with self.assertRaises(NoSuchElementException):
-            scraper.get_by("table.NotATable")
+            scraper.get_by("css", "table.NotATable")
         scraper.quit()
 
 class TestGettingSpecificElements(unittest.TestCase):
