@@ -1,22 +1,10 @@
 from selenium import webdriver
 from selenium.common.exceptions import (
-    InvalidArgumentException, 
+    InvalidArgumentException,
     NoSuchElementException
 )
 
-def create_selector(driver, element_type, selector):
-    if element_type == "css":
-        return SelectorCSS(driver, selector)
-    return None
-
-def _check_result(func):
-    def check_result(self):
-        try:
-            return [func(self)]
-        except NoSuchElementException:
-            return []
-    return check_result
-
+from src.Selection import create_selector
 
 class Scraper:
     def __init__(self, url):
@@ -41,28 +29,3 @@ class Scraper:
 
     def execute(self, script, argument):
         self.driver.execute_script(f"{script}({argument});")
-
-
-class Selector:
-    def __init__(self, driver):
-        self.driver = driver
-
-    def get_first(self):
-        pass
-
-    def get_all(self):
-        pass
-
-
-class SelectorCSS(Selector):
-    def __init__(self, driver, selector):
-        super().__init__(driver)
-        self.selector = selector
-
-    @_check_result
-    def get_first(self):
-        return self.driver.find_element_by_css_selector(self.selector)
-
-    def get_all(self):
-        return self.driver.find_elements_by_css_selector(self.selector)
-

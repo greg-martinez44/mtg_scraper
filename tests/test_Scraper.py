@@ -2,7 +2,7 @@ import unittest
 
 from selenium import webdriver
 from selenium.common.exceptions import (
-    InvalidArgumentException, 
+    InvalidArgumentException,
     NoSuchElementException
 )
 """
@@ -14,6 +14,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from src.Scraper import Scraper
 
 URL = "https://www.mtgtop8.com/format?f=ST"
+
 
 class TestDriver(unittest.TestCase):
     def setUp(self):
@@ -53,6 +54,8 @@ class TestDriver(unittest.TestCase):
         self.scraper.quit()
 
 # Skipping because it is gumming up the webdriver access...
+
+
 @unittest.SkipTest
 class TestDriverWithBadInputsDefaultExceptions(unittest.TestCase):
 
@@ -74,7 +77,8 @@ class TestGettingSpecificElements(unittest.TestCase):
         self.scraper = Scraper(URL)
 
     def test_should_give_all_tables_with_class_Stable(self):
-        table_elements = self.scraper.get_by("css", "table.Stable", get_all=True)
+        table_elements = self.scraper.get_by(
+            "css", "table.Stable", get_all=True)
         self.assertTrue(len(table_elements) > 1)
         self.assertIsInstance(table_elements, list)
 
@@ -82,10 +86,9 @@ class TestGettingSpecificElements(unittest.TestCase):
         table_element = self.scraper.get_by("css", "table.Stable")
         self.assertEqual(len(table_element), 1)
 
-
-
     def tearDown(self):
         self.scraper.quit()
+
 
 if __name__ == "__main__":
     unittest.main()
