@@ -63,7 +63,7 @@ class TestDriverWithBadInputsDefaultExceptions(unittest.TestCase):
 
     def test_should_get_mad_if_no_keys_in_selector(self):
         scraper = Scraper(URL)
-        result = scraper.get_by("css", "table.NotATable", get_all=False)
+        result = scraper.get_by("css", "table.NotATable")
         self.assertFalse(result)
         scraper.quit()
 
@@ -74,12 +74,12 @@ class TestGettingSpecificElements(unittest.TestCase):
         self.scraper = Scraper(URL)
 
     def test_should_give_all_tables_with_class_Stable(self):
-        table_elements = self.scraper.get_by("css", "table.Stable")
+        table_elements = self.scraper.get_by("css", "table.Stable", get_all=True)
         self.assertTrue(len(table_elements) > 1)
         self.assertIsInstance(table_elements, list)
 
     def test_should_give_first_table_with_class_stable(self):
-        table_element = self.scraper.get_by("css", "table.Stable", get_all=False)
+        table_element = self.scraper.get_by("css", "table.Stable")
         self.assertEqual(len(table_element), 1)
 
 
