@@ -21,7 +21,7 @@ class Scraper:
     def get_page_source(self):
         return self.driver.page_source
 
-    def get_by_selector(self, selector):
+    def get_by(self, selector):
         return self.driver.find_element_by_css_selector(selector)
 
     def execute(self, script, argument):
@@ -29,6 +29,7 @@ class Scraper:
 
     def close(self):
         self.driver.close()
+
 
 class ElementSelector(Scraper):
 
