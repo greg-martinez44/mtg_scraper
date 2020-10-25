@@ -5,7 +5,7 @@ from selenium.common.exceptions import (
     InvalidArgumentException,
 )
 
-from src.Scraper import Scraper
+from src.Scraper import Scraper, ScraperManager
 
 """
 Hold for future? If not used, DELETE
@@ -107,7 +107,7 @@ class TestGettingSpecificElements(unittest.TestCase):
     def test_finding_all_things_by_class_not_css(self):
         result = self.scraper.get_by("class", "S14", get_all=True)
         self.assertGreaterEqual(len(result), 2)
-        self.assertEqual("1158 decks", result[1].text)
+        self.assertEqual("1213 decks", result[1].text)
 
     def test_find_one_row_of_stable_with_xpath(self):
         result = self.scraper.get_by(
@@ -115,9 +115,9 @@ class TestGettingSpecificElements(unittest.TestCase):
             )
         self.assertEqual(len(result), 1)
         self.assertEqual(
-            "Week of Wings Entry Event Friday Flight 1 @ Red Bull Untapped", result[0].text
+            '"Emperor of Standard" Tournament 11th Season @ Hareruya (Japan)', result[0].text
             )
-        self.assertIn("event?e=27834&f=ST", result[0].get_attribute("href"))
+        self.assertIn("event?e=27842&f=ST", result[0].get_attribute("href"))
 
     def test_find_all_rows_in_stable_with_xpath(self):
         results = self.scraper.get_by(
@@ -146,6 +146,11 @@ class TestGettingSpecificElements(unittest.TestCase):
     def tearDown(self):
         self.scraper.quit()
 
+class TestWithContextManager(unittest.TestCase):
+
+    def test_should_return_scraper_object(self):
+        with ScraperManager(URL) as scraper:
+            self.assertIsInstance(scraper, Scraper)
 
 if __name__ == "__main__":
     unittest.main()

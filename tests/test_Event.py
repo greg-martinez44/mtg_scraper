@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup
 
 from src.Event import Event
 
+@unittest.SkipTest
 class TestResultsFromBeautifulSoup(unittest.TestCase):
     URL = "https://www.mtgtop8.com/format?f=ST"
     def setUp(self):

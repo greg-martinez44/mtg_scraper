@@ -5,6 +5,17 @@ from src.Selection import create_selector
 #TODO: App should cycle through stable -> hover_tr for event names.Keep
 #clicking Next until you have a class Nav_pn_no in page_source
 
+
+class ScraperManager:
+    def __init__(self, url):
+        self.url = url
+        self.scraper = Scraper(self.url)
+    def __enter__(self):
+        return self.scraper
+
+    def __exit__(self, exc_type, exc_value, exc_traceback):
+        return self.scraper.quit()
+
 class Scraper:
     def __init__(self, url):
         self.url = url
