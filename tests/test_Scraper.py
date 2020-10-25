@@ -24,7 +24,7 @@ class TestDriver(unittest.TestCase):
     def test_get_mtgtop8(self):
         page_title = self.scraper.get_title().lower()
         self.assertIn("mtg", page_title)
-        self.assertEqual(self.scraper.driver.current_url, URL)
+        self.assertEqual(self.scraper.get_url(), URL)
 
     def test_stable_should_be_in_page_one_body(self):
         page_source = self.scraper.get_page_source()
