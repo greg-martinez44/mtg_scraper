@@ -6,17 +6,17 @@ from src.Selection import create_selector
 #clicking Next until you have a class Nav_pn_no in page_source
 
 
-class ScraperManager:
+class Scraper:
     def __init__(self, url):
         self.url = url
-        self.scraper = Scraper(self.url)
+        self.scraper = _Scraper(self.url)
     def __enter__(self):
         return self.scraper
 
     def __exit__(self, exc_type, exc_value, exc_traceback):
         return self.scraper.quit()
 
-class Scraper:
+class _Scraper:
     def __init__(self, url):
         self.url = url
         self.driver = webdriver.Safari()
