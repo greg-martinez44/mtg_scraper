@@ -108,10 +108,6 @@ class TestGettingSpecificElements(unittest.TestCase):
         self.assertGreaterEqual(len(result), 2)
         self.assertEqual("1158 decks", result[1].text)
 
-    def test_find_specific_table_with_class(self):
-        result = self.scraper.get_by("css", "table.Stable tr.hover_tr")
-        self.assertEqual(len(result), 1)
-
     def tearDown(self):
         self.scraper.quit()
 

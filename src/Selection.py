@@ -13,6 +13,8 @@ def create_selector(driver, element_type, selector):
         return SelectorID(driver, selector)
     if element_type == "class":
         return SelectorClass(driver, selector)
+    if element_type == "xpath":
+        return SelectorXpath(driver, selector)
     return None
 
 
@@ -79,3 +81,14 @@ class SelectorClass(Selector):
 
     def get_all(self):
         return self.driver.find_elements_by_class_name(self.selector)
+
+class SelectorXpath(Selector):
+    def __init__(self, driver, selector):
+        super().__init__(driver, selector)
+
+    @_check_result
+    def get_first(self):
+        return self.driver.find_element_by_xpath(self.selector)
+
+    def get_all(self):
+        return self.driver.find_elements_by_xpath(self.selector)
