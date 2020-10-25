@@ -1,4 +1,3 @@
-import selenium
 import unittest
 
 from src import (
@@ -8,21 +7,13 @@ from src import (
 
 URL = "https://www.mtgtop8.com/format?f=ST"
 
-# Need to rework with Manager
-@unittest.SkipTest
 class TestMain(unittest.TestCase):
 
     def setUp(self):
         self.main = main.get_event_links(URL)
 
-    def test_main_makes_scraper(self):
+    def test_main_makes_list(self):
         result = self.main
-        self.assertIsInstance(result, Scraper.Scraper)
+        self.assertIsInstance(result, list)
 
-    def test_main_gets_correct_url(self):
-        result = self.main
-        self.assertEqual(result.get_url(), URL)
-
-    def tearDown(self):
-        self.main.quit()
 
