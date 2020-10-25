@@ -23,6 +23,7 @@ class TestDriver(unittest.TestCase):
     def test_get_mtgtop8(self):
         page_title = self.scraper.get_title().lower()
         self.assertIn("mtg", page_title)
+        self.assertEqual(self.scraper.driver.current_url, URL)
 
     def test_stable_should_be_in_page_one_body(self):
         page_source = self.scraper.get_page_source()
@@ -86,6 +87,11 @@ class TestGettingSpecificElements(unittest.TestCase):
 
     def test_finding_one_thing_by_name(self):
         result = self.scraper.get_by("name", "meta")
+        self.assertEqual(len(result), 1)
+        self.assertIsInstance(result, list)
+
+    def test_finding_one_thing_by_id(self):
+        result = self.scraper.get_by("id", "other_tooltip")
         self.assertEqual(len(result), 1)
         self.assertIsInstance(result, list)
 

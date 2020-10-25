@@ -67,9 +67,6 @@ class SelectorID(Selector):
     @_check_result
     def get_first(self):
         return self.driver.find_element_by_id(self.selector)
-    
-    def get_all(self):
-        return self.driver.find_elements_by_id(self.selector)
 
 class SelectorClass(Selector):
 
