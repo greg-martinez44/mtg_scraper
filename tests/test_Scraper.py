@@ -95,6 +95,17 @@ class TestGettingSpecificElements(unittest.TestCase):
         self.assertEqual(len(result), 1)
         self.assertIsInstance(result, list)
 
+    def test_finding_one_thing_by_class_not_css(self):
+        result = self.scraper.get_by("class", "S14")
+        self.assertEqual(len(result), 1)
+        self.assertIsInstance(result, list)
+        self.assertIn("Players Tour Online", result[0].text)
+
+    def test_finding_all_things_by_class_not_css(self):
+        result = self.scraper.get_by("class", "S14", get_all=True)
+        self.assertGreaterEqual(len(result), 2)
+        self.assertEqual("1158 decks", result[1].text)
+
     def tearDown(self):
         self.scraper.quit()
 
