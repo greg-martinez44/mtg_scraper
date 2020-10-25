@@ -1,17 +1,17 @@
 import unittest
 
-from selenium import webdriver
 from selenium.common.exceptions import (
     InvalidArgumentException,
-    NoSuchElementException
 )
+
+from src.Scraper import Scraper
+
 """
 Hold for future? If not used, DELETE
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 """
 
-from src.Scraper import Scraper
 
 URL = "https://www.mtgtop8.com/format?f=ST"
 
@@ -50,6 +50,8 @@ class TestDriver(unittest.TestCase):
 
     def test_first_page_should_have_this_event_title(self):
         event_title = "Artisan ! @ Lotus eSports"
+        page_source = self.scraper.get_page_source()
+        self.assertIn(event_title, page_source)
 
     def tearDown(self):
         self.scraper.quit()
@@ -105,6 +107,10 @@ class TestGettingSpecificElements(unittest.TestCase):
         result = self.scraper.get_by("class", "S14", get_all=True)
         self.assertGreaterEqual(len(result), 2)
         self.assertEqual("1158 decks", result[1].text)
+
+    def test_find_specific_table_with_class(self):
+        result = self.scraper.get_by("css", "table.Stable tr.hover_tr")
+        self.assertEqual(len(result), 1)
 
     def tearDown(self):
         self.scraper.quit()
