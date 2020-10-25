@@ -1,4 +1,5 @@
 import unittest
+import time
 
 from selenium.common.exceptions import (
     InvalidArgumentException,
@@ -109,10 +110,38 @@ class TestGettingSpecificElements(unittest.TestCase):
         self.assertEqual("1158 decks", result[1].text)
 
     def test_find_one_row_of_stable_with_xpath(self):
-        result = self.scraper.get_by("xpath", "//table[@class='Stable'][2]//tr[@class='hover_tr']//a")
+        result = self.scraper.get_by(
+            "xpath", "//table[@class='Stable'][2]//tr[@class='hover_tr']//a"
+            )
         self.assertEqual(len(result), 1)
-        self.assertEqual("Week of Wings Entry Event Friday Flight 1 @ Red Bull Untapped", result[0].text)
+        self.assertEqual(
+            "Week of Wings Entry Event Friday Flight 1 @ Red Bull Untapped", result[0].text
+            )
         self.assertIn("event?e=27834&f=ST", result[0].get_attribute("href"))
+
+    def test_find_all_rows_in_stable_with_xpath(self):
+        results = self.scraper.get_by(
+            "xpath", "//table[@class='Stable'][2]//tr[@class='hover_tr']//a",
+            get_all=True
+            )
+        self.assertEqual(len(results), 10)
+        events = [item.text for item in results]
+        links = [item.get_attribute("href") for item in results]
+        self.assertIn("Torneios @ Loja Ludo Quest", events)
+        self.assertIn("https://www.mtgtop8.com/event?e=27845&f=ST", links)
+
+    def test_xpath_finds_things_on_other_pages(self):
+        self.scraper.execute("PageSubmit", 8)
+        time.sleep(2)
+        results = self.scraper.get_by(
+            "xpath", "//table[@class='Stable'][2]//tr[@class='hover_tr']//a",
+            get_all=True
+            )
+        self.assertEqual(len(results), 10)
+        events = [item.text for item in results]
+        links = [item.get_attribute("href") for item in results]
+        self.assertIn("Monday Night Magic 2 @ Plague League", events)
+        self.assertIn("https://www.mtgtop8.com/event?e=27623&f=ST", links)
 
     def tearDown(self):
         self.scraper.quit()

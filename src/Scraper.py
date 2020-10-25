@@ -1,8 +1,4 @@
 from selenium import webdriver
-from selenium.common.exceptions import (
-    InvalidArgumentException,
-    NoSuchElementException
-)
 
 from src.Selection import create_selector
 
