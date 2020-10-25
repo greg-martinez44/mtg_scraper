@@ -6,6 +6,9 @@ from selenium.common.exceptions import (
 
 from src.Selection import create_selector
 
+#TODO: App should cycle through stable -> hover_tr for event names.Keep
+#clicking Next until you have a class Nav_pn_no in page_source
+
 class Scraper:
     def __init__(self, url):
         self.url = url
