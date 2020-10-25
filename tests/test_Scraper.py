@@ -108,10 +108,11 @@ class TestGettingSpecificElements(unittest.TestCase):
         self.assertGreaterEqual(len(result), 2)
         self.assertEqual("1158 decks", result[1].text)
 
-    def test_find_stable_with_xpath(self):
-        result = self.scraper.get_by("xpath", "//table[@class='Stable'][2]")
+    def test_find_one_row_of_stable_with_xpath(self):
+        result = self.scraper.get_by("xpath", "//table[@class='Stable'][2]//tr[@class='hover_tr']//a")
         self.assertEqual(len(result), 1)
-        self.assertIn("Week of Wings Entry Event Friday Flight 1 @ Red Bull Untapped", result[0].text)
+        self.assertEqual("Week of Wings Entry Event Friday Flight 1 @ Red Bull Untapped", result[0].text)
+        self.assertIn("event?e=27834&f=ST", result[0].get_attribute("href"))
 
     def tearDown(self):
         self.scraper.quit()
