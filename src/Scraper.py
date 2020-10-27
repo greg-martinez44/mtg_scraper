@@ -21,6 +21,12 @@ class _Scraper:
         self.url = url
         self.driver = webdriver.Safari()
         self.driver.get(self.url)
+    
+    def __repr__(self):
+        return self.driver.page_source
+
+    def get_page_source(self):
+        return self.driver.page_source
 
     def get_title(self):
         return self.driver.title
@@ -30,9 +36,6 @@ class _Scraper:
 
     def quit(self):
         self.driver.quit()
-
-    def get_page_source(self):
-        return self.driver.page_source
 
     def get_by(self, element_type, selector):
         result = create_selector(self.driver, element_type, selector)

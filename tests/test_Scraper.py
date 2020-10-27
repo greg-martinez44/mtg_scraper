@@ -19,19 +19,19 @@ class TestDriver(unittest.TestCase):
 
     def test_stable_should_be_in_page_one_body(self):
         with Scraper(URL) as scraper:
-            page_source = scraper.get_page_source()
+            page_source = repr(scraper)
             self.assertIn("Stable", page_source)
             self.assertNotIn("Stttbl", page_source)
 
     def test_should_return_a_string_for_page_source(self):
         with Scraper(URL) as scraper:
-            page_source = scraper.get_page_source()
+            page_source = repr(scraper)
             self.assertIsInstance(page_source, str)
 
     def test_is_page_one_with_no_previous_button(self):
         page = 2
         with Scraper(URL) as scraper:
-            page_source = scraper.get_page_source()
+            page_source = repr(scraper)
             stable = scraper.get_by("css", "table.Stable")
         self.assertIn("Nav_PN_no", page_source)
         self.assertIn(f"PageSubmit({page})", page_source)
@@ -46,7 +46,7 @@ class TestDriver(unittest.TestCase):
     def test_first_page_should_have_this_event_title(self):
         event_title = "FNM @ Deckmaster Games"
         with Scraper(URL) as scraper:
-            page_source = scraper.get_page_source()
+            page_source = repr(scraper)
         self.assertIn(event_title, page_source)
 
 
@@ -142,5 +142,10 @@ class TestWithContextManager(unittest.TestCase):
         with Scraper(URL) as scraper:
             self.assertIsInstance(scraper, _Scraper)
 
+class TestRepr(unittest.TestCase):
+
+    def test_should_print_page_source(self):
+        with Scraper(URL) as scraper:
+            print(scraper)
 if __name__ == "__main__":
     unittest.main()
