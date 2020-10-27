@@ -70,7 +70,7 @@ class TestGettingSpecificElements(unittest.TestCase):
 
     def test_should_give_all_tables_with_class_Stable(self):
         with Scraper(URL) as scraper:
-            table_elements = scraper.get_by_all(
+            table_elements = scraper.get_all_by(
                 "css", "table.Stable")
         self.assertTrue(len(table_elements) > 1)
         self.assertIsInstance(table_elements, list)
@@ -101,7 +101,7 @@ class TestGettingSpecificElements(unittest.TestCase):
 
     def test_finding_all_things_by_class_not_css(self):
         with Scraper(URL) as scraper:
-            result = scraper.get_by_all("class", "S14")
+            result = scraper.get_all_by("class", "S14")
             self.assertGreaterEqual(len(result), 2)
             self.assertEqual("1243 decks", result[1].text)
 
@@ -114,7 +114,7 @@ class TestGettingSpecificElements(unittest.TestCase):
 
     def test_find_all_rows_in_stable_with_xpath(self):
         with Scraper(URL) as scraper:
-            results = scraper.get_by_all(
+            results = scraper.get_all_by(
                 "xpath", "//table[@class='Stable'][2]//tr[@class='hover_tr']//a"
                 )
             self.assertEqual(len(results), 10)
@@ -127,7 +127,7 @@ class TestGettingSpecificElements(unittest.TestCase):
         with Scraper(URL) as scraper:
             scraper.execute("PageSubmit", 9)
             time.sleep(2)
-            results = scraper.get_by_all(
+            results = scraper.get_all_by(
                 "xpath", "//table[@class='Stable'][2]//tr[@class='hover_tr']//a"
             )
             self.assertEqual(len(results), 10)

@@ -38,7 +38,7 @@ class _Scraper:
         result = create_selector(self.driver, element_type, selector)
         return result.get_first()
 
-    def get_by_all(self, element_type, selector):
+    def get_all_by(self, element_type, selector):
         result = create_selector(self.driver, element_type, selector)
         return result.get_all()
 
