@@ -119,3 +119,11 @@ console.warn: SearchSettings: "get: No settings file exists, new profile?" (new 
 1603796629555	Marionette	INFO	Listening on port 59621
 1603796629646	Marionette	WARN	TLS certificate errors will be ignored for this session
 1603796630299	Marionette	INFO	Stopped listening on port 59621
+1603796907399	geckodriver	INFO	Listening on 127.0.0.1:59683
+1603796908412	mozrunner::runner	INFO	Running command: "/Applications/Firefox.app/Contents/MacOS/firefox-bin" "--marionette" "-foreground" "-no-remote" "-profile" "/var/folders/lw/24ghlkdx4pv87vfx8k_pfhd80000gn/T/rust_mozprofileLB36G8"
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1603796910461	Marionette	INFO	Listening on port 59694
+1603796910489	Marionette	WARN	TLS certificate errors will be ignored for this session
+1603796911304	Marionette	INFO	Stopped listening on port 59694
+console.error: services.settings: 
+  main/whats-new-panel Signature failed  TypeError: NetworkError when attempting to fetch resource.
