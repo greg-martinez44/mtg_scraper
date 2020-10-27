@@ -9,11 +9,8 @@ URL = "https://www.mtgtop8.com/format?f=ST"
 
 class TestMain(unittest.TestCase):
 
-    def setUp(self):
-        self.main = main.get_event_links(URL)
-
-    def test_main_makes_list(self):
-        result = self.main
+    def test_main_makes_scraper(self):
+        result = main.get_events_from(URL)
         self.assertIsInstance(result, list)
 
 
