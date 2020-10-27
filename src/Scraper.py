@@ -19,8 +19,11 @@ class Scraper:
 class _Scraper:
     def __init__(self, url):
         self.url = url
-        self.driver = webdriver.Safari()
+        self.driver = webdriver.Firefox()
         self.driver.get(self.url)
+
+    def __repr__(self):
+        return f"Page source: {self.get_page_source()}"
 
     def get_title(self):
         return self.driver.title
