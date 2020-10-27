@@ -35,10 +35,14 @@ class _Scraper:
         return self.driver.page_source
 
     def get_by(self, element_type, selector, get_all=False):
-        selector = create_selector(self.driver, element_type, selector)
+        result = create_selector(self.driver, element_type, selector)
         if get_all:
-            return selector.get_all()
-        return selector.get_first()
+            return result.get_all()
+        return result.get_first()
+
+    def get_by_all(self, element_type, selector):
+        result = create_selector(self.driver, element_type, selector)
+        return result.get_all()
 
     def execute(self, script, argument):
         self.driver.execute_script(f"{script}({argument});")
