@@ -25,9 +25,6 @@ class _Scraper:
     def __repr__(self):
         return self.driver.page_source
 
-    def get_page_source(self):
-        return self.driver.page_source
-
     def get_title(self):
         return self.driver.title
 
