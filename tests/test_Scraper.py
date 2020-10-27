@@ -7,15 +7,7 @@ from selenium.common.exceptions import (
 
 from src.Scraper import Scraper, _Scraper
 
-"""
-Hold for future? If not used, DELETE
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support.ui import WebDriverWait
-"""
-
-
 URL = "https://www.mtgtop8.com/format?f=ST"
-
 
 class TestDriver(unittest.TestCase):
 
@@ -111,14 +103,14 @@ class TestGettingSpecificElements(unittest.TestCase):
         with Scraper(URL) as scraper:
             result = scraper.get_by("class", "S14", get_all=True)
             self.assertGreaterEqual(len(result), 2)
-            self.assertEqual("1213 decks", result[1].text)
+            self.assertEqual("1243 decks", result[1].text)
 
     def test_find_one_row_of_stable_with_xpath(self):
         with Scraper(URL) as scraper:
             result = scraper.get_by("xpath", "//table[@class='Stable'][2]//tr[@class='hover_tr']//a")
             self.assertEqual(len(result), 1)
-            self.assertEqual('"Emperor of Standard" Tournament 11th Season @ Hareruya (Japan)', result[0].text)
-            self.assertIn("event?e=27842&f=ST", result[0].get_attribute("href"))
+            self.assertEqual("Japan Championship 2020 Autumn - Last Chance Trial @ BIG Magic", result[0].text)
+            self.assertIn("event?e=27876&f=ST", result[0].get_attribute("href"))
 
     def test_find_all_rows_in_stable_with_xpath(self):
         with Scraper(URL) as scraper:
@@ -129,12 +121,12 @@ class TestGettingSpecificElements(unittest.TestCase):
             self.assertEqual(len(results), 10)
             events = [item.text for item in results]
             links = [item.get_attribute("href") for item in results]
-            self.assertIn("Torneios @ Loja Ludo Quest", events)
-            self.assertIn("https://www.mtgtop8.com/event?e=27845&f=ST", links)
+            self.assertIn("FNM @ Deckmaster Games", events)
+            self.assertIn("https://www.mtgtop8.com/event?e=27847&f=ST", links)
 
     def test_xpath_finds_things_on_other_pages(self):
         with Scraper(URL) as scraper:
-            scraper.execute("PageSubmit", 8)
+            scraper.execute("PageSubmit", 9)
             time.sleep(2)
             results = scraper.get_by(
                 "xpath", "//table[@class='Stable'][2]//tr[@class='hover_tr']//a", 
