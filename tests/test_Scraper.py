@@ -137,6 +137,11 @@ class TestGettingSpecificElements(unittest.TestCase):
             # self.assertIn("Monday Night Magic 2 @ Plague League", events)
             # self.assertIn("https://www.mtgtop8.com/event?e=27623&f=ST", links)
 
+    def test_xpath_finds_dates(self):
+        with Scraper(URL) as scraper:
+            result = scraper.get_by("xpath", "//table[@class='Stable'][2]//tr[@class='hover_tr']//td[@class='S10']")
+            self.assertEqual(result[0].text, '30/10/20')
+
 class TestWithContextManager(unittest.TestCase):
 
     def test_should_return_scraper_object(self):

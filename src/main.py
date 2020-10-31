@@ -1,4 +1,6 @@
 import csv
+
+import time
 from src.Scraper import Scraper
 
 URL = "https://www.mtgtop8.com/format?f=ST"
@@ -10,11 +12,25 @@ def main():
 
 def scrape_data_from(url):
     print(">>Opening scraper<<")
+    result = []
+    next_page = True
+    page = 1
     with Scraper(url) as scraper:
-        events = get_events_from(scraper)
-        result = get_links_to(events)
+        result = get_page(scraper)
+        while next_page:
+            print(">>While loop executes<<")
+            page += 1
+            scraper.execute("PageSubmit", page)
+            time.sleep(2)
+            result.extend(get_page(scraper))
+            next_page = "Nav_PN_no" not in repr(scraper)
         return result
 
+def get_page(scraper):
+    events = get_events_from(scraper)
+    result = get_links_to(events)
+    time.sleep(2)
+    return result
 
 def get_events_from(scraper):
     print(">>Enter get_events_from<<")
