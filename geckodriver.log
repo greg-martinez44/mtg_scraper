@@ -873,3 +873,15 @@ console.warn: SearchSettings: "get: No settings file exists, new profile?" (new 
 1604148152171	Marionette	INFO	Stopped listening on port 60772
 console.error: services.settings: 
   main/fxmonitor-breaches Signature failed  TypeError: NetworkError when attempting to fetch resource.
+1604148644446	geckodriver	INFO	Listening on 127.0.0.1:60850
+1604148644458	mozrunner::runner	INFO	Running command: "/Applications/Firefox.app/Contents/MacOS/firefox-bin" "--marionette" "-foreground" "-no-remote" "-profile" "/var/folders/lw/24ghlkdx4pv87vfx8k_pfhd80000gn/T/rust_mozprofileUSZxff"
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1604148646563	Marionette	INFO	Listening on port 60859
+1604148646640	Marionette	WARN	TLS certificate errors will be ignored for this session
+1604148746209	Marionette	INFO	Stopped listening on port 60859
+1604149675274	geckodriver	INFO	Listening on 127.0.0.1:60988
+1604149675286	mozrunner::runner	INFO	Running command: "/Applications/Firefox.app/Contents/MacOS/firefox-bin" "--marionette" "-foreground" "-no-remote" "-profile" "/var/folders/lw/24ghlkdx4pv87vfx8k_pfhd80000gn/T/rust_mozprofilekDCsZG"
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1604149677728	Marionette	INFO	Listening on port 60997
+1604149677780	Marionette	WARN	TLS certificate errors will be ignored for this session
+1604149777380	Marionette	INFO	Stopped listening on port 60997

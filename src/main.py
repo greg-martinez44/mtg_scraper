@@ -28,8 +28,20 @@ def scrape_data_from(url):
 
 def get_page(scraper):
     events = get_events_from(scraper)
-    result = get_links_to(events)
+    dates = get_dates_from(scraper)
+    result = get_info_for(events, dates)
     time.sleep(2)
+    return result
+
+def get_info_for(events, dates):
+    print(">>Enter get_links_to<<")
+    return [(event.text, event.get_attribute("href"), date.text) for event, date in zip(events, dates)]
+
+def get_dates_from(scraper):
+    result = scraper.get_all_by(
+        "xpath", 
+        "//table[@class='Stable'][2]//tr[@class='hover_tr']//td[@class='S10']"
+        )
     return result
 
 def get_events_from(scraper):
@@ -40,22 +52,18 @@ def get_events_from(scraper):
     )
     return result
 
-def get_links_to(events):
-    print(">>Enter get_links_to<<")
-    return [(event.text, event.get_attribute("href")) for event in events]
-
 def save(links):
     print(">>Enter save<<")
-    header = ['Event','Link']
+    header = ['Event','Link', 'Date']
     result = csv_from(links)
-    with open("links.csv", 'w') as links_file:
+    with open("links.csv", 'a') as links_file:
         writer = csv.writer(links_file)
         writer.writerow(header)
         for event in result:
             writer.writerow(event)
 
 def csv_from(links):
-    return [(f'{name}', f'{event}') for name, event in links]
+    return [(f'{name}', f'{event}', f'{date}') for name, event, date in links]
 
 if __name__ == "__main__":
     main()
