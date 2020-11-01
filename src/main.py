@@ -1,4 +1,6 @@
 import csv
+import os
+import sqlite3
 
 import time
 from src.Scraper import Scraper
@@ -11,14 +13,12 @@ def main():
     save(result)
 
 def scrape_data_from(url):
-    print(">>Opening scraper<<")
     result = []
     next_page = True
     page = 1
     with Scraper(url) as scraper:
         result = get_page(scraper)
         while next_page:
-            print(">>While loop executes<<")
             page += 1
             scraper.execute("PageSubmit", page)
             time.sleep(2)
@@ -33,9 +33,12 @@ def get_page(scraper):
     time.sleep(2)
     return result
 
-def get_info_for(events, dates):
-    print(">>Enter get_links_to<<")
-    return [(event.text, event.get_attribute("href"), date.text) for event, date in zip(events, dates)]
+def get_events_from(scraper):
+    result = scraper.get_all_by(
+        "xpath", 
+        "//table[@class='Stable'][2]//tr[@class='hover_tr']//a"
+    )
+    return result
 
 def get_dates_from(scraper):
     result = scraper.get_all_by(
@@ -44,26 +47,31 @@ def get_dates_from(scraper):
         )
     return result
 
-def get_events_from(scraper):
-    print(">>Enter get_events_from<<")
-    result = scraper.get_all_by(
-        "xpath", 
-        "//table[@class='Stable'][2]//tr[@class='hover_tr']//a"
-    )
-    return result
+def get_info_for(events, dates):
+    return [(event.text, event.get_attribute("href"), date.text) for event, date in zip(events, dates)]
 
-def save(links):
-    print(">>Enter save<<")
-    header = ['Event','Link', 'Date']
-    result = csv_from(links)
-    with open("links.csv", 'a') as links_file:
-        writer = csv.writer(links_file)
-        writer.writerow(header)
-        for event in result:
-            writer.writerow(event)
+def save(data):
+    result = union_events("links.db", data)
 
-def csv_from(links):
-    return [(f'{name}', f'{event}', f'{date}') for name, event, date in links]
+def union_events(db, data):
+    conn = sqlite3.connect(os.path.abspath("dbs/links.db"))
+    cursor = conn.cursor()
+    for event in data:
+        add_new_(cursor, event)
+    conn.commit()
+    conn.close()
+
+def add_new(cursor, event):
+    try:
+        cursor.execute(
+            """
+            INSERT INTO event (name, link, date)
+            VALUES (?, ?, ?)
+            """, (event,)
+            )
+    except sqlite3.IntegrityError:
+        pass
+
 
 if __name__ == "__main__":
     main()
