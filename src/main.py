@@ -56,8 +56,10 @@ def save(data):
 def union_events(db, data):
     conn = sqlite3.connect(os.path.abspath("dbs/links.db"))
     cursor = conn.cursor()
+
+
     for event in data:
-        add_new_(cursor, event)
+        add_new(cursor, event)
     conn.commit()
     conn.close()
 
@@ -67,7 +69,7 @@ def add_new(cursor, event):
             """
             INSERT INTO event (name, link, date)
             VALUES (?, ?, ?)
-            """, (event,)
+            """, (event)
             )
     except sqlite3.IntegrityError:
         pass
