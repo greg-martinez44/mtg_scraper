@@ -1005,3 +1005,44 @@ console.warn: SearchSettings: "get: No settings file exists, new profile?" (new 
 1604752668397	Marionette	INFO	Listening on port 65127
 1604752668424	Marionette	WARN	TLS certificate errors will be ignored for this session
 1604752772394	Marionette	INFO	Stopped listening on port 65127
+1604761183266	geckodriver	INFO	Listening on 127.0.0.1:49409
+1604761183279	mozrunner::runner	INFO	Running command: "/Applications/Firefox.app/Contents/MacOS/firefox-bin" "--marionette" "-foreground" "-no-remote" "-profile" "/var/folders/lw/24ghlkdx4pv87vfx8k_pfhd80000gn/T/rust_mozprofileB7GK1w"
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1604761185476	Marionette	INFO	Listening on port 49418
+1604761185558	Marionette	WARN	TLS certificate errors will be ignored for this session
+1604761293761	Marionette	INFO	Stopped listening on port 49418
+1604771729899	geckodriver	INFO	Listening on 127.0.0.1:50178
+1604771729911	mozrunner::runner	INFO	Running command: "/Applications/Firefox.app/Contents/MacOS/firefox-bin" "--marionette" "-foreground" "-no-remote" "-profile" "/var/folders/lw/24ghlkdx4pv87vfx8k_pfhd80000gn/T/rust_mozprofileR2ADeJ"
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1604771738078	Marionette	INFO	Listening on port 50187
+1604771738169	Marionette	WARN	TLS certificate errors will be ignored for this session
+console.error: Region.jsm: "Error fetching region" (new AbortError("The operation was aborted. ", (void 0), 697))
+console.error: Region.jsm: "Failed to fetch region" (new Error("NO_RESULT", "resource://gre/modules/Region.jsm", 351))
+JavaScript error: , line 0: AbortError: A request was aborted, for example through a call to IDBTransaction.abort.
+1604771820257	Marionette	INFO	Stopped listening on port 50187
+1604771857030	geckodriver	INFO	Listening on 127.0.0.1:50364
+1604771857042	mozrunner::runner	INFO	Running command: "/Applications/Firefox.app/Contents/MacOS/firefox-bin" "--marionette" "-foreground" "-no-remote" "-profile" "/var/folders/lw/24ghlkdx4pv87vfx8k_pfhd80000gn/T/rust_mozprofile3pql91"
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1604771865343	Marionette	INFO	Listening on port 50373
+1604771865459	Marionette	WARN	TLS certificate errors will be ignored for this session
+console.error: Region.jsm: "Error fetching region" (new AbortError("The operation was aborted. ", (void 0), 697))
+console.error: Region.jsm: "Failed to fetch region" (new Error("NO_RESULT", "resource://gre/modules/Region.jsm", 351))
+1604771895620	geckodriver	INFO	Listening on 127.0.0.1:50489
+1604771896640	mozrunner::runner	INFO	Running command: "/Applications/Firefox.app/Contents/MacOS/firefox-bin" "--marionette" "-foreground" "-no-remote" "-profile" "/var/folders/lw/24ghlkdx4pv87vfx8k_pfhd80000gn/T/rust_mozprofileaKw3QO"
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1604771901788	Marionette	INFO	Listening on port 50500
+1604771901892	Marionette	WARN	TLS certificate errors will be ignored for this session
+console.error: Region.jsm: "Error fetching region" (new AbortError("The operation was aborted. ", (void 0), 697))
+console.error: Region.jsm: "Failed to fetch region" (new Error("NO_RESULT", "resource://gre/modules/Region.jsm", 351))
+1604772507558	addons.xpi	ERROR	System addon update list error Error: Failed downloading XML, status: 0, reason: timeout
+1604772547239	addons.xpi	ERROR	System addon update list error Error: Failed downloading XML, status: 0, reason: timeout
+1604773559295	Marionette	INFO	Stopped listening on port 50500
+1604773564892	Marionette	INFO	Stopped listening on port 50373
+1604773609926	geckodriver	INFO	Listening on 127.0.0.1:50860
+1604773609939	mozrunner::runner	INFO	Running command: "/Applications/Firefox.app/Contents/MacOS/firefox-bin" "--marionette" "-foreground" "-no-remote" "-profile" "/var/folders/lw/24ghlkdx4pv87vfx8k_pfhd80000gn/T/rust_mozprofile6v7LCG"
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1604773615124	Marionette	INFO	Listening on port 50869
+1604773615209	Marionette	WARN	TLS certificate errors will be ignored for this session
+console.error: Region.jsm: "Error fetching region" (new AbortError("The operation was aborted. ", (void 0), 697))
+console.error: Region.jsm: "Failed to fetch region" (new Error("NO_RESULT", "resource://gre/modules/Region.jsm", 351))
+1604773782426	Marionette	INFO	Stopped listening on port 50869
