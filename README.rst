@@ -16,9 +16,16 @@ Execute Scraper
 ---------------
 A button executes the scraping function that grabs the event data from mtgtop8.com.
 
+The scraper should also crawl through the new items in the list to get the deck lists for each event.
+
 Display Results
 ---------------
 A message appears that tells the user how many _new_ items were added to the sqlite database file.
+
+* Grab the max id value before scraping
+* After scraping, if the max id is larger than previously:
+    - Find the difference to quantify how many items were added.
+    - Display the event titles for the new events.
 
 Visualize Data
 --------------

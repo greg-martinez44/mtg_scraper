@@ -151,17 +151,17 @@ class ScraperApp(tk.Tk):
 
         app_frame.grid(row=1)
         
-        test_frame = tk.Frame(self)
-        wrapped_fxn = super().register(self.test_validation)
-        test_textbox = LabelInput(
-            test_frame,
-            input_args={
-                "validate": "key",
-                "validatecommand": (wrapped_fxn, "%P")
-                }
-            )
-        test_textbox.grid(row=0)
-        test_frame.grid(row=2)
+        # test_frame = tk.Frame(self)
+        # wrapped_fxn = super().register(self.test_validation)
+        # test_textbox = LabelInput(
+        #     test_frame,
+        #     input_args={
+        #         "validate": "key",
+        #         "validatecommand": (wrapped_fxn, "%P")
+        #         }
+        #     )
+        # test_textbox.grid(row=0)
+        # test_frame.grid(row=2)
 
     def on_click(self):
         start_scraping()
