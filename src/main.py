@@ -3,6 +3,7 @@ import os
 import sqlite3
 
 import time
+import sys; sys.path.append("/Users/gregmartinez/projects/mtg_scraper")
 from src.Scraper import Scraper
 URL = "https://www.mtgtop8.com/format?f=ST"
 

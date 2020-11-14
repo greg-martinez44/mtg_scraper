@@ -2,9 +2,10 @@ import os
 import tkinter as tk
 from tkinter import ttk
 
+import sys; sys.path.append("/Users/gregmartinez/projects/mtg_scraper")
 from src.main import main as start_scraping
 
-
+CARDBACK = os.path.join(os.path.dirname(__file__), "images/magic_card.png")
 
 class LabelInput(tk.Frame):
     def __init__(
@@ -74,16 +75,16 @@ class LabelInput(tk.Frame):
 # class ScraperAppFrame(tk.Frame):
 #     def __init__(self, parent, *args, **kwargs):
 #         super().__init__(parent, *args, **kwargs)
-        
+
 #         self.inputs = {}
 #         self.build_scraper()
 #         self.build_closer()
-        
+
 #         self.reset()
 
 #     def build_scraper(self):
 #         scraper_frame = tk.LabelFrame(self, text="Scraper")
-#         image = tk.PhotoImage(name="card", file=path_to_cardback, height=470, width=335)
+#         image = tk.PhotoImage(name="card", file=CARDBACK, height=470, width=335)
 #         self.inputs["scraper_button"] = LabelInput(
 #             scraper_frame,
 #             input_class=tk.Button,
@@ -121,11 +122,11 @@ class LabelInput(tk.Frame):
 #     def destroy(self):
 #         super().destroy
 
-path_to_cardback = os.path.join(os.path.dirname(__file__), "images/magic_card.png")
+
 class ScraperApp(tk.Tk):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.image = tk.PhotoImage(name="card", file=path_to_cardback, height=470, width=335),
+        self.image = tk.PhotoImage(name="card", file=CARDBACK, height=470, width=335),
 
         self.title("MTG Top 8 Scraper")
 
@@ -150,18 +151,6 @@ class ScraperApp(tk.Tk):
             ).grid(row=1)
 
         app_frame.grid(row=1)
-        
-        # test_frame = tk.Frame(self)
-        # wrapped_fxn = super().register(self.test_validation)
-        # test_textbox = LabelInput(
-        #     test_frame,
-        #     input_args={
-        #         "validate": "key",
-        #         "validatecommand": (wrapped_fxn, "%P")
-        #         }
-        #     )
-        # test_textbox.grid(row=0)
-        # test_frame.grid(row=2)
 
     def on_click(self):
         start_scraping()
