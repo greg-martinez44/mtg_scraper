@@ -7,12 +7,14 @@ from bs4 import BeautifulSoup
 
 
 def get_deck_table():
+    
     event_df = _open_sql("event")
     results = []
     for link, event in zip(event_df["link"], event_df["name"]):
         html = requests.get(link)
         soup = BeautifulSoup(html.text, features="lxml")
         body = soup.body
+        
 
         names, ranks = _get_winners(body)
 
@@ -47,6 +49,7 @@ def get_deck_table():
 
 def _open_sql(table):
     db = "dbs/links.db"
+    
     conn = sqlite3.connect(db)
     result = pd.read_sql(f"SELECT * FROM {table}", conn)
     conn.close()

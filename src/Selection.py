@@ -3,9 +3,6 @@ from selenium.common.exceptions import (
     NoSuchElementException
 )
 
-breakpoint()
-
-
 def create_selector(driver, element_type, selector):
     if element_type == "css":
         return SelectorCSS(driver, selector)
