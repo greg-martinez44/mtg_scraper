@@ -24,9 +24,7 @@ def get_deck_table():
         names.extend(other_names)
         ranks.extend(other_ranks)
 
-        players = []
-        for player in body.find_all("div", class_="G11")[:len(names)]:
-            players.append(player.find("a").text)
+        players = _get_players(body, names)
 
         assert _are_equal_length(names, ranks, players), \
             "names: " + str(len(names)) \
@@ -90,6 +88,13 @@ def _add_other_decks(body, has_points=False):
                     result.text), "Bad name - " + result.text
                 names.append(result.text.strip())
     return names, ranks
+
+
+def _get_players(body, names):
+    result = []
+    for player in body.find_all("div", class_="G11")[:len(names)]:
+        result.append(player.find("a").text)
+    return result
 
 
 def _is_malformed(name):
