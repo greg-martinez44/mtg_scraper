@@ -1,10 +1,10 @@
 import csv
 import os
 import sqlite3
-
 import time
-import sys; sys.path.append("/Users/gregmartinez/projects/mtg_scraper")
+
 from src.Scraper import Scraper
+
 URL = "https://www.mtgtop8.com/format?f=ST"
 
 def main():
@@ -53,28 +53,29 @@ def get_info_for(events, dates):
     ]
 
 def save(data):
-    result = union_events("links.db", data)
+    union_events("links.db", data)
 
 def union_events(db, data):
     conn = sqlite3.connect(os.path.abspath("dbs/links.db"))
     cursor = conn.cursor()
 
     for event in data:
-        add_new(cursor, event)
+        add_new(cursor, "event", event)
     conn.commit()
     conn.close()
 
-def add_new(cursor, event):
+def add_new(cursor, table, data):
     """New events are added to the sqlite3 table; Unique constraint on event ensures that no repeats are added."""
-    try:
-        cursor.execute(
-            """
-            INSERT INTO event (name, link, date)
-            VALUES (?, ?, ?)
-            """, (event)
-            )
-    except sqlite3.IntegrityError:
-        pass
+    if table == "event":
+        try:
+            cursor.execute(
+                f"""
+                INSERT INTO event (name, link, date)
+                VALUES (?, ?, ?)
+                """, (data)
+                )
+        except sqlite3.IntegrityError:
+            pass
 
 
 if __name__ == "__main__":
