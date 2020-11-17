@@ -3,11 +3,59 @@ import pandas as pd
 import re
 import requests
 import sqlite3
+import time
 from bs4 import BeautifulSoup
+
+from src.Scraper import Scraper
+
+URL = "https://www.mtgtop8.com/format?f=ST"
+
+def scrape_data_from(url):
+    """Uses webdriver to populate event table from mtgtop8.com"""
+    result = []
+    with Scraper(url) as scraper:
+        page = 1
+        result = _get_page(scraper)
+        next_page = True
+        while next_page:
+            page += 1
+            scraper.execute("PageSubmit", page)
+            time.sleep(2)
+            result.extend(_get_page(scraper))
+            time.sleep(2)
+            next_page = "Nav_PN_no" not in str(scraper)
+        return result
+
+def _get_page(scraper):
+    events = _get_events_from(scraper)
+    dates = _get_dates_from(scraper)
+    result = _get_info_for(events, dates)
+    return result
+
+def _get_events_from(scraper):
+    result = scraper.get_all_by(
+        "xpath",
+        "//table[@class='Stable'][2]//tr[@class='hover_tr']//a"
+    )
+    return result
+
+def _get_dates_from(scraper):
+    result = scraper.get_all_by(
+        "xpath",
+        "//table[@class='Stable'][2]//tr[@class='hover_tr']//td[@class='S10']"
+        )
+    return result
+
+def _get_info_for(events, dates):
+    return [
+        (event.text, event.get_attribute("href"), date.text)
+        for event, date in zip(events, dates)
+    ]
+
 
 
 def get_deck_table():
-    
+    """Opens event table and gets deck data from each liink in event table"""
     event_df = _open_sql("event")
     results = []
     for link, event in zip(event_df["link"], event_df["name"]):
@@ -124,7 +172,22 @@ def _are_equal_length(*args):
             equal = False
     return equal
 
+def _save(data):
+    for player, name, rank in data:
+        _union(db, player, "player")
+        _union(db, (name, rank), "deck")
 
-if __name__ == "__main__":
-    deck_table = get_deck_table()
-    print(deck_table)
+def _save_events(data):
+    pass
+
+def _save_players(data):
+    pass
+
+def _save_decks(data):
+    pass
+
+def _save_decklists(data):
+    pass
+
+def _save_cards(data):
+    pass

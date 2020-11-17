@@ -3,64 +3,23 @@ import os
 import sqlite3
 import time
 
-from src.Scraper import Scraper
+from src import models as m
 
 URL = "https://www.mtgtop8.com/format?f=ST"
 
 def main():
-    result = scrape_data_from(URL)
+    result = m.scrape_data_from(URL)
     save(result)
 
-def scrape_data_from(url):
-    result = []
-    with Scraper(url) as scraper:
-        page = 1
-        result = get_page(scraper)
-        next_page = True
-        while next_page:
-            page += 1
-            scraper.execute("PageSubmit", page)
-            time.sleep(2)
-            result.extend(get_page(scraper))
-            time.sleep(2)
-            next_page = "Nav_PN_no" not in str(scraper)
-        return result
-
-def get_page(scraper):
-    events = get_events_from(scraper)
-    dates = get_dates_from(scraper)
-    result = get_info_for(events, dates)
-    return result
-
-def get_events_from(scraper):
-    result = scraper.get_all_by(
-        "xpath",
-        "//table[@class='Stable'][2]//tr[@class='hover_tr']//a"
-    )
-    return result
-
-def get_dates_from(scraper):
-    result = scraper.get_all_by(
-        "xpath",
-        "//table[@class='Stable'][2]//tr[@class='hover_tr']//td[@class='S10']"
-        )
-    return result
-
-def get_info_for(events, dates):
-    return [
-        (event.text, event.get_attribute("href"), date.text)
-        for event, date in zip(events, dates)
-    ]
-
 def save(data):
-    union_events("links.db", data)
+    union_events("links.db", data, "event")
 
-def union_events(db, data):
+def union_events(db, data, table):
     conn = sqlite3.connect(os.path.abspath("dbs/links.db"))
     cursor = conn.cursor()
 
     for event in data:
-        add_new(cursor, "event", event)
+        add_new(cursor, table, event)
     conn.commit()
     conn.close()
 
@@ -69,13 +28,29 @@ def add_new(cursor, table, data):
     if table == "event":
         try:
             cursor.execute(
-                f"""
+                """
                 INSERT INTO event (name, link, date)
                 VALUES (?, ?, ?)
                 """, (data)
                 )
         except sqlite3.IntegrityError:
             pass
+    elif table == "player":
+        try:
+            cursor.execute(
+                """
+                INSERT INTO player (firstName, lastName)
+                VALUES (?, ?)
+                """, data
+                )
+        except sqlite3.IntegrityError:
+            pass
+    elif table == "deck":
+        pass
+    elif table == "decklist":
+        pass
+    elif table == "card":
+        pass
 
 
 if __name__ == "__main__":
