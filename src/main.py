@@ -14,7 +14,7 @@ def main():
         {
             "event": event_table,
             "pilot": parse_pilots_from(deck_data),
-            # "deck": deck_data
+            "deck": deck_data
         }
     )
 
@@ -24,11 +24,9 @@ def save(data):
             sql_db.union_events(data[table], table)
 
 def parse_pilots_from(deck_data):
-    print("Parsing deck data...")
     player_table = []
     for item in deck_data:
         player_table.append(item[1].split(maxsplit=1))
-    print("returning player_table: ", player_table)
     return player_table
 
 if __name__ == "__main__":

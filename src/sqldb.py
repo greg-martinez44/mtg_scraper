@@ -41,12 +41,11 @@ class SQLDatabase:
                 )
             except sqlite3.IntegrityError:
                 pass
+
         elif table == "pilot":
-            print("Start of 'player' clause")
             if len(item) == 1:
                 item += [""]
             try:
-                print("try to insert: ", item)
                 self._cursor.execute(
                     """
                     INSERT INTO pilot (firstName, lastName)
@@ -54,30 +53,34 @@ class SQLDatabase:
                     """, item
                 )
             except sqlite3.IntegrityError:
-                print("Integrity Error raised")
                 pass
+
         elif table == "deck":
-            for thing in item:
-                query = """
-                INSERT INTO deck (eventId, pilotId, url, name, rank)
-                values (?, ?, ?, ?, ?)
-                """
-                event_id = self._cursor.execute("""
-                    SELECT id
-                    FROM event
-                    WHERE link = ?
-                    """, thing[0])
-                pilot_id = self._cursor.execute("""
-                    SELECT id
-                    FROM pilot
-                    WHERE (firstName || lastName) = ?
-                    """, "".join(thing[1].split()))
-                try:
-                    self._cursor.execute(query, [event_id, pilot_id] + thing)
-                except sqlite3.IntegrityError:
-                    pass
+            query = """
+            INSERT INTO deck (eventId, pilotId, deckUrl, name, rank)
+            values (?, ?, ?, ?, ?)
+            """
+            event_id = self._cursor.execute("""
+                SELECT id
+                FROM event
+                WHERE link = ?
+                """, (item[0], )
+            ).fetchone()[0]
+            pilot_id = self._cursor.execute("""
+                SELECT id
+                FROM pilot
+                WHERE (firstName || lastName) = ?
+                """, ("".join(item[1].split(maxsplit=1)),)
+            ).fetchone()[0]
+            items_to_insert = item[2:]
+            try:
+                self._cursor.execute(query, (event_id, pilot_id) + items_to_insert)
+            except sqlite3.IntegrityError:
+                pass
+
         elif table == "decklist":
             pass
+
         elif table == "card":
             pass
 

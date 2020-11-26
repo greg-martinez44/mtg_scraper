@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS deck (
     pilotId INTEGER,
     deckUrl TEXT NOT NULL UNIQUE,
     name TEXT NOT NULL,
-    rank INTEGER,
+    rank TEXT,
     FOREIGN KEY (eventId) REFERENCES event(id),
     FOREIGN KEY (pilotId) REFERENCES pilot(id)
 );

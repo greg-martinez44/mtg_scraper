@@ -116,8 +116,7 @@ def _add_other_decks(body, has_points=False):
     links = []
     if has_points:
         for name in body.find_all("div", class_="S14")[:-3]:
-            assert not _is_malformed(
-                name.text), "Bad name - " + name.text
+            assert not _is_malformed(name.text), "Bad name - " + name.text
             names.append(name.text.strip())
             this_link = name.find("a").get("href")
             assert _is_a_link(this_link), "Bad link - " + this_link
@@ -134,8 +133,7 @@ def _add_other_decks(body, has_points=False):
                     break
                 ranks.append(result.text.strip())
             else:
-                assert not _is_malformed(
-                    result.text), "Bad name - " + result.text
+                assert not _is_malformed(result.text), "Bad name - " + result.text
                 names.append(result.text.strip())
                 this_link = result.find("a").get("href")
                 assert _is_a_link(this_link), "Bad link - " + this_link
@@ -176,5 +174,3 @@ def _are_equal_length(*args):
             equal = False
     return equal
 
-def get_cards():
-    deck_df = _open_sql("deck")
