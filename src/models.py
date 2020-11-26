@@ -1,12 +1,11 @@
-import os
 import pandas as pd
 import re
 import requests
-import sqlite3
 import time
 from bs4 import BeautifulSoup
 
 from src.Scraper import Scraper
+from src.sqldb import SQLDatabase
 
 URL = "https://www.mtgtop8.com/format?f=ST"
 
@@ -52,17 +51,14 @@ def _get_info_for(events, dates):
         for event, date in zip(events, dates)
     ]
 
-
-
 def get_deck_table():
-    """Opens event table and gets deck data from each liink in event table"""
+    """Opens event table and gets deck data from each link in event table"""
     event_df = _open_sql("event")
     results = []
     for link, event in zip(event_df["link"], event_df["name"]):
         html = requests.get(link)
         soup = BeautifulSoup(html.text, features="lxml")
         body = soup.body
-        
 
         names, ranks = _get_winners(body)
 
@@ -94,14 +90,9 @@ def get_deck_table():
 
     return results
 
-
 def _open_sql(table):
-    db = "dbs/links.db"
-    
-    conn = sqlite3.connect(db)
-    result = pd.read_sql(f"SELECT * FROM {table}", conn)
-    conn.close()
-    return result
+    with SQLDatabase() as sql_db:
+        return sql_db.get_dataframe_from(table)
 
 
 def _get_winners(body):
@@ -124,7 +115,7 @@ def _add_other_decks(body, has_points=False):
                 name.text), "Bad name - " + name.text
             names.append(name.text.strip())
         for points in body.find_all("div", class_="S12"):
-            if not should_be_skipped(points.text):
+            if not _should_be_skipped(points.text):
                 assert _is_points(points.text), "Malformed Points " + \
                     points.text
                 ranks.append(points.text.strip())
@@ -152,7 +143,7 @@ def _is_malformed(name):
     return re.match("^\$[0-9]*\ \(.*\)$", name) or re.match("^[0-9]*\ TIX$", name)
 
 
-def should_be_skipped(rank):
+def _should_be_skipped(rank):
     return rank == "close" or rank == "Companion card"
 
 
@@ -172,22 +163,3 @@ def _are_equal_length(*args):
             equal = False
     return equal
 
-def _save(data):
-    for player, name, rank in data:
-        _union(db, player, "player")
-        _union(db, (name, rank), "deck")
-
-def _save_events(data):
-    pass
-
-def _save_players(data):
-    pass
-
-def _save_decks(data):
-    pass
-
-def _save_decklists(data):
-    pass
-
-def _save_cards(data):
-    pass
