@@ -55,7 +55,7 @@ def scrape_event_data():
     """Opens event table and gets deck data from each link in event table"""
     event_df = _open_sql("event")
     results = []
-    for link, event in zip(event_df["link"], event_df["name"]):
+    for link in event_df["link"]:
         html = requests.get(link)
         soup = BeautifulSoup(html.text, features="lxml")
         body = soup.body
@@ -84,9 +84,9 @@ def scrape_event_data():
 
         results.extend(
             [
-                (event, player, name, rank, link)
-                for (player, name, rank, link)
-                in zip(players, names, ranks, links)
+                (html.url, player, link, name, rank)
+                for (player, link, name, rank)
+                in zip(players, links, names, ranks)
             ]
         )
 
