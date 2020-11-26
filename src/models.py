@@ -51,7 +51,7 @@ def _get_info_for(events, dates):
         for event, date in zip(events, dates)
     ]
 
-def get_deck_table():
+def scrape_event_data():
     """Opens event table and gets deck data from each link in event table"""
     event_df = _open_sql("event")
     results = []
@@ -60,15 +60,16 @@ def get_deck_table():
         soup = BeautifulSoup(html.text, features="lxml")
         body = soup.body
 
-        names, ranks = _get_winners(body)
+        names, ranks, links = _get_winners(body)
 
         has_points = False
         if _is_points(ranks[0]):
             has_points = True
 
-        other_names, other_ranks = _add_other_decks(body, has_points)
+        other_names, other_ranks, other_links = _add_other_decks(body, has_points)
         names.extend(other_names)
         ranks.extend(other_ranks)
+        links.extend(other_links)
 
         players = _get_players(body, names)
 
@@ -76,15 +77,16 @@ def get_deck_table():
             "names: " + str(len(names)) \
             + ", ranks: " + str(len(ranks)) \
             + ", players: " + str(len(players)) \
+            + ", links: " + str(len(links)) \
             + " at " + html.url
         assert _are_equal_length(
-            list(zip(names, ranks, players)), names, ranks, players)
+            list(zip(names, ranks, players, links)), names, ranks, players, links)
 
         results.extend(
             [
-                (event, player, name, rank)
-                for (player, name, rank)
-                in zip(players, names, ranks)
+                (event, player, name, rank, link)
+                for (player, name, rank, link)
+                in zip(players, names, ranks, links)
             ]
         )
 
@@ -99,21 +101,27 @@ def _get_winners(body):
     try:
         winner_rank = body.find_all("div", class_="W12")[1].text
         winner_name = body.find_all("div", class_="W14")[0].find("a").text
+        winner_link = body.find_all("div", class_="W14")[0].find("a").get("href")
     except (IndexError, AttributeError):
         winner_rank = body.find_all("div", class_="W14")[0].text
         winner_name = body.find_all("div", class_="W14")[1].find("a").text
+        winner_link = body.find_all("div", class_="W14")[1].find("a").get("href")
     finally:
-        return [winner_name], [winner_rank]
+        return [winner_name], [winner_rank], [winner_link]
 
 
 def _add_other_decks(body, has_points=False):
     names = []
     ranks = []
+    links = []
     if has_points:
         for name in body.find_all("div", class_="S14")[:-3]:
             assert not _is_malformed(
                 name.text), "Bad name - " + name.text
             names.append(name.text.strip())
+            this_link = name.find("a").get("href")
+            assert _is_a_link(this_link), "Bad link - " + this_link
+            links.append(this_link)
         for points in body.find_all("div", class_="S12"):
             if not _should_be_skipped(points.text):
                 assert _is_points(points.text), "Malformed Points " + \
@@ -129,7 +137,10 @@ def _add_other_decks(body, has_points=False):
                 assert not _is_malformed(
                     result.text), "Bad name - " + result.text
                 names.append(result.text.strip())
-    return names, ranks
+                this_link = result.find("a").get("href")
+                assert _is_a_link(this_link), "Bad link - " + this_link
+                links.append(this_link)
+    return names, ranks, links
 
 
 def _get_players(body, names):
@@ -142,6 +153,8 @@ def _get_players(body, names):
 def _is_malformed(name):
     return re.match("^\$[0-9]*\ \(.*\)$", name) or re.match("^[0-9]*\ TIX$", name)
 
+def _is_a_link(link):
+    return re.match("^\?e=.*&d=.*&f=ST", link)
 
 def _should_be_skipped(rank):
     return rank == "close" or rank == "Companion card"
@@ -163,3 +176,5 @@ def _are_equal_length(*args):
             equal = False
     return equal
 
+def get_cards():
+    deck_df = _open_sql("deck")

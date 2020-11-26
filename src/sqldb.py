@@ -1,4 +1,5 @@
 import os
+import pandas as pd
 import sqlite3
 
 class SQLDatabase:
@@ -51,7 +52,14 @@ class SQLDatabase:
             except sqlite3.IntegrityError:
                 pass
         elif table == "deck":
-            pass
+            query = """
+            INSERT INTO deck (eventId, pilotId, name, rank, url)
+            values (?, ?, ?, ?, ?)
+            """
+            try:
+                self._cursor.execute(query, item)
+            except sqlite3.IntegrityError:
+                pass
         elif table == "decklist":
             pass
         elif table == "card":
