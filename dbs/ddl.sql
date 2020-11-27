@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS deck (
 );
 CREATE TABLE IF NOT EXISTS deckList (
     cardId TEXT,
-    deckId INTEGER
+    deckId INTEGER,
     count INTEGER,
     slot TEXT,
     FOREIGN KEY (deckId) REFERENCES deck(id)
