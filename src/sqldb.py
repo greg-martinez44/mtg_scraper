@@ -82,7 +82,14 @@ class SQLDatabase:
             pass
 
         elif table == "card":
-            pass
+            query = """
+            INSERT INTO card (setNumber, setName, name, cmc, color, standardLegality, oracle_text, mana_cost)
+            values (?, ?, ?, ?, ?, ?, ?, ?)
+            """
+            try:
+                self._cursor.execute(query, item)
+            except sqlite3.IntegrityError:
+                pass
 
     def get_dataframe_from(self, table):
         query = f"SELECT * FROM {table}"

@@ -1270,3 +1270,23 @@ console.warn: SearchSettings: "get: No settings file exists, new profile?" (new 
 1606427300881	Marionette	INFO	Listening on port 58850
 1606427300925	Marionette	WARN	TLS certificate errors will be ignored for this session
 1606427407508	Marionette	INFO	Stopped listening on port 58850
+1606441712977	geckodriver	INFO	Listening on 127.0.0.1:59481
+1606441713976	mozrunner::runner	INFO	Running command: "/Applications/Firefox.app/Contents/MacOS/firefox-bin" "--marionette" "-foreground" "-no-remote" "-profile" "/var/folders/lw/24ghlkdx4pv87vfx8k_pfhd80000gn/T/rust_mozprofileDcdmtW"
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1606441716880	Marionette	INFO	Listening on port 59496
+1606441716997	Marionette	WARN	TLS certificate errors will be ignored for this session
+1606441823108	Marionette	INFO	Stopped listening on port 59496
+1606485880150	geckodriver	INFO	Listening on 127.0.0.1:61831
+1606485881165	mozrunner::runner	INFO	Running command: "/Applications/Firefox.app/Contents/MacOS/firefox-bin" "--marionette" "-foreground" "-no-remote" "-profile" "/var/folders/lw/24ghlkdx4pv87vfx8k_pfhd80000gn/T/rust_mozprofile9mHcjD"
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1606485883872	Marionette	INFO	Listening on port 61842
+1606485883987	Marionette	WARN	TLS certificate errors will be ignored for this session
+1606485990059	Marionette	INFO	Stopped listening on port 61842
+1606486927302	geckodriver	INFO	Listening on 127.0.0.1:62464
+1606486928320	mozrunner::runner	INFO	Running command: "/Applications/Firefox.app/Contents/MacOS/firefox-bin" "--marionette" "-foreground" "-no-remote" "-profile" "/var/folders/lw/24ghlkdx4pv87vfx8k_pfhd80000gn/T/rust_mozprofilehCGKW2"
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1606486930516	Marionette	INFO	Listening on port 62475
+1606486930604	Marionette	WARN	TLS certificate errors will be ignored for this session
+console.error: Region.jsm: "Error fetching region" (new Error("TIMEOUT", "resource://gre/modules/Region.jsm", 726))
+console.error: Region.jsm: "Failed to fetch region" (new Error("TIMEOUT", "resource://gre/modules/Region.jsm", 376))
+1606487046377	Marionette	INFO	Stopped listening on port 62475

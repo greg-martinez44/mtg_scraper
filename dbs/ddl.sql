@@ -1,4 +1,9 @@
-
+CREATE TABLE IF NOT EXISTS event (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    link TEXT NOT NULL UNIQUE,
+    date TEXT NOT NULL
+);
 
 CREATE TABLE IF NOT EXISTS pilot (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -7,10 +12,15 @@ CREATE TABLE IF NOT EXISTS pilot (
 	UNIQUE(firstName, lastName)
 );
 CREATE TABLE IF NOT EXISTS card (
-    cardId INTEGER PRIMARY KEY AUTOINCREMENT,
+    setNumber TEXT NOT NULL,
+    setName TEXT NOT NULL,
     name TEXT,
     cmc INTEGER,
-    color TEXT
+    color TEXT,
+    mana_cost TEXT,
+    standardLegality TEXT,
+    oracle_text TEXT,
+    PRIMARY KEY(setNumber, setName)
 );
 CREATE TABLE IF NOT EXISTS deck (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -23,10 +33,9 @@ CREATE TABLE IF NOT EXISTS deck (
     FOREIGN KEY (pilotId) REFERENCES pilot(id)
 );
 CREATE TABLE IF NOT EXISTS deckList (
-    cardId INTEGER,
+    cardId TEXT,
     deckId INTEGER
     count INTEGER,
     slot TEXT,
-    FOREIGN KEY (cardId) REFERENCES card(id),
     FOREIGN KEY (deckId) REFERENCES deck(id)
 );

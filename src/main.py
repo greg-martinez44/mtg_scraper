@@ -12,6 +12,7 @@ def main():
     deck_data = m.scrape_event_data()
     save(
         {
+            "card": m.update_card_table(),
             "event": event_table,
             "pilot": parse_pilots_from(deck_data),
             "deck": deck_data

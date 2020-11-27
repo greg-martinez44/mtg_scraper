@@ -8,6 +8,14 @@ from src.Scraper import Scraper
 from src.sqldb import SQLDatabase
 
 URL = "https://www.mtgtop8.com/format?f=ST"
+SCRYFALL = "https://api.scryfall.com/cards/search?q=set%3A"
+SETS = [
+    "eld",
+    "thb",
+    "iko",
+    "m21",
+    "znr"
+]
 
 def scrape_data_from(url):
     """Uses webdriver to populate event table from mtgtop8.com"""
@@ -174,3 +182,44 @@ def _are_equal_length(*args):
             equal = False
     return equal
 
+def update_card_table():
+    card_table = []
+    for card_set in SETS:
+        set_url = f"https://api.scryfall.com/cards/search?q=set%3A'{card_set}'"
+
+        card_data_response = requests.get(set_url)
+        card_data_json = card_data_response.json()
+        card_data = card_data_json["data"]
+
+        while card_data_json["has_more"]:
+            next_page = card_data_json["next_page"]
+            card_data_response = requests.get(next_page)
+            card_data_json = card_data_response.json()
+            card_data.extend(card_data_json["data"])
+    
+        for card in card_data:
+            this_card = (
+                card["collector_number"],
+                card["set"],
+                card["name"],
+                int(card["cmc"]),
+                "".join(card["color_identity"]),
+                card["legalities"]["standard"]
+            )
+
+            try:
+                oracle_text = card["oracle_text"]
+            except KeyError:
+                oracle_text = " // ".join(face["oracle_text"] for face in card["card_faces"])
+
+            try:
+                mana_cost = card["mana_cost"]
+            except KeyError:
+                mana_cost = " // ".join(face["mana_cost"] for face in card["card_faces"])
+                if mana_cost == " // ":
+                    mana_cost = ""
+
+            this_card += (oracle_text, mana_cost)
+            card_table.append(this_card)
+
+    return card_table
