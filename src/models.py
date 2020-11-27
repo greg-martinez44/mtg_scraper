@@ -8,7 +8,6 @@ from src.Scraper import Scraper
 from src.sqldb import SQLDatabase
 
 URL = "https://www.mtgtop8.com/format?f=ST"
-SCRYFALL = "https://api.scryfall.com/cards/search?q=set%3A"
 SETS = [
     "eld",
     "thb",
@@ -183,6 +182,7 @@ def _are_equal_length(*args):
     return equal
 
 def update_card_table():
+    """Get cards from SETS using the Scryfall API"""
     card_table = []
     for card_set in SETS:
         set_url = f"https://api.scryfall.com/cards/search?q=set%3A'{card_set}'"
@@ -207,6 +207,7 @@ def update_card_table():
                 card["legalities"]["standard"]
             )
 
+            # Oracle text & Mana costs are different for cards with two faces...
             try:
                 oracle_text = card["oracle_text"]
             except KeyError:
