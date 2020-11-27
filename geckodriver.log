@@ -1290,3 +1290,21 @@ console.warn: SearchSettings: "get: No settings file exists, new profile?" (new 
 console.error: Region.jsm: "Error fetching region" (new Error("TIMEOUT", "resource://gre/modules/Region.jsm", 726))
 console.error: Region.jsm: "Failed to fetch region" (new Error("TIMEOUT", "resource://gre/modules/Region.jsm", 376))
 1606487046377	Marionette	INFO	Stopped listening on port 62475
+1606506154884	geckodriver	INFO	Listening on 127.0.0.1:64149
+1606506155909	mozrunner::runner	INFO	Running command: "/Applications/Firefox.app/Contents/MacOS/firefox-bin" "--marionette" "-foreground" "-no-remote" "-profile" "/var/folders/lw/24ghlkdx4pv87vfx8k_pfhd80000gn/T/rust_mozprofileIRVNuv"
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1606506158169	Marionette	INFO	Listening on port 64160
+1606506158201	Marionette	WARN	TLS certificate errors will be ignored for this session
+1606506264125	Marionette	INFO	Stopped listening on port 64160
+1606510931377	geckodriver	INFO	Listening on 127.0.0.1:49279
+1606510931417	mozrunner::runner	INFO	Running command: "/Applications/Firefox.app/Contents/MacOS/firefox-bin" "--marionette" "-foreground" "-no-remote" "-profile" "/var/folders/lw/24ghlkdx4pv87vfx8k_pfhd80000gn/T/rust_mozprofileogxriB"
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1606510933988	Marionette	INFO	Listening on port 49288
+1606510934016	Marionette	WARN	TLS certificate errors will be ignored for this session
+1606511039951	Marionette	INFO	Stopped listening on port 49288
+1606511322013	geckodriver	INFO	Listening on 127.0.0.1:49745
+1606511323029	mozrunner::runner	INFO	Running command: "/Applications/Firefox.app/Contents/MacOS/firefox-bin" "--marionette" "-foreground" "-no-remote" "-profile" "/var/folders/lw/24ghlkdx4pv87vfx8k_pfhd80000gn/T/rust_mozprofileG54Q7Y"
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1606511325324	Marionette	INFO	Listening on port 49756
+1606511325416	Marionette	WARN	TLS certificate errors will be ignored for this session
+1606511431605	Marionette	INFO	Stopped listening on port 49756

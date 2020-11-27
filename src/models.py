@@ -224,3 +224,35 @@ def update_card_table():
             card_table.append(this_card)
 
     return card_table
+
+def scrape_deck_lists():
+    deck_data = _open_sql("deck")
+    card_data = _open_sql("card")
+    ROOT_URL = "https://www.mtgtop8.com/event"
+    urls = ROOT_URL + deck_data["deckUrl"]
+
+    assert len(list(deck_data["id"])) == len(urls), "Mismatched list of decks to urls"
+    deck_lists = []
+    for url, deck_id in zip(urls, deck_data["id"]):
+        deck_list_response = requests.get(url)
+        deck_list_soup = BeautifulSoup(deck_list_response.text, features="lxml")
+        deck_list_body = deck_list_soup.body
+
+        for item in deck_list_body.find_all("td", class_="G14"):
+            this_card = item.text.strip().split(maxsplit=1)
+            count = this_card[0]
+            assert count.isdigit(), "Count is not a digit - " + deck_list_response.url + " - " + this_card
+            name = this_card[1]
+
+            this_id = item.find_all("span", class_="L14")[0].get("id")[:-2]
+            slot = this_id[:2]
+            set_name = this_id[2:5]
+            collector_number = this_id[5:]
+            if set_name == "11m":
+                set_name = "m11"
+
+            deck_lists.append(
+                (collector_number+set_name, deck_id, count, slot, )
+            )
+
+    return deck_lists

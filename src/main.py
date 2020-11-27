@@ -15,7 +15,8 @@ def main():
             "card": m.update_card_table(),
             "event": event_table,
             "pilot": parse_pilots_from(deck_data),
-            "deck": deck_data
+            "deck": deck_data,
+            "decklist": m.scrape_deck_lists()
         }
     )
 

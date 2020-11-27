@@ -58,7 +58,7 @@ class SQLDatabase:
         elif table == "deck":
             query = """
             INSERT INTO deck (eventId, pilotId, deckUrl, name, rank)
-            values (?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?)
             """
             event_id = self._cursor.execute("""
                 SELECT id
@@ -79,12 +79,19 @@ class SQLDatabase:
                 pass
 
         elif table == "decklist":
-            pass
+            query = """
+            INSERT INTO deckList (cardId, deckId, count, slot)
+            VALUES (?, ?, ?, ?)
+            """
+            try:
+                self._cursor.execute(query, item)
+            except sqlite3.IntegrityError:
+                pass
 
         elif table == "card":
             query = """
             INSERT INTO card (setNumber, setName, name, cmc, color, standardLegality, oracle_text, mana_cost)
-            values (?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """
             try:
                 self._cursor.execute(query, item)
