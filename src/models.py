@@ -16,6 +16,10 @@ SETS = [
     "znr"
 ]
 
+def _open_sql(table):
+    with SQLDatabase() as sql_db:
+        return sql_db.get_dataframe_from(table)
+
 def scrape_data_from(url):
     """Uses webdriver to populate event table from mtgtop8.com"""
     result = []
@@ -99,9 +103,6 @@ def scrape_event_data():
 
     return results
 
-def _open_sql(table):
-    with SQLDatabase() as sql_db:
-        return sql_db.get_dataframe_from(table)
 
 
 def _get_winners(body):
