@@ -13,7 +13,11 @@ SETS = [
     "thb",
     "iko",
     "m21",
-    "znr"
+    "znr",
+    "war",
+    "rna",
+    "grn",
+    "m20"
 ]
 
 def _open_sql(table):
@@ -251,6 +255,10 @@ def scrape_deck_lists():
             collector_number = this_id[5:]
             if set_name == "11m":
                 set_name = "m11"
+            if set_name == "10m":
+                set_name = "m10"
+            if set_name == "12m":
+                set_name = "m12"
 
             deck_lists.append(
                 (collector_number+set_name, deck_id, count, slot, )

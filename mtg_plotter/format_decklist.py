@@ -17,7 +17,7 @@ def list_colors(card_name: str, set_code: str) -> str:
         
     return colors
 
-def split_qty_and_name(formatted_decklist: str) -> (list, list):
+def split_qty_and_name(formatted_decklist: str) -> (list, list, list):
     qty_column = []
     name_column = []
     code_column = []
