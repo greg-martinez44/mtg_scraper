@@ -17,7 +17,49 @@ SETS = [
     "war",
     "rna",
     "grn",
-    "m20"
+    "m20",
+    "mor",
+    "frf",
+    "m11",
+    "m12",
+    "m10",
+    "m13",
+    "m19",
+    "m14",
+    "m15",
+    "aer",
+    "akh",
+    "bng",
+    "chk",
+    "dar",
+    "dis",
+    "dka",
+    "dom",
+    "emn",
+    "gtc",
+    "hou",
+    "ice",
+    "inv",
+    "isd",
+    "jou",
+    "ktk",
+    "leg",
+    "mbs",
+    "mh1",
+    "mrd",
+    "ogw",
+    "ori",
+    "rav",
+    "rix",
+    "roe",
+    "rtr",
+    "sha",
+    "soi",
+    "som",
+    "ths",
+    "tsp",
+    "xln",
+    "zen"
 ]
 
 def _open_sql(table):
@@ -70,40 +112,41 @@ def scrape_event_data():
     """Opens event table and gets deck data from each link in event table"""
     event_df = _open_sql("event")
     results = []
-    for link in event_df["link"]:
-        html = requests.get(link)
-        soup = BeautifulSoup(html.text, features="lxml")
-        body = soup.body
+    with requests.Session() as this_session:
+        for link in event_df["link"]:
+            html = this_session.get(link)
+            soup = BeautifulSoup(html.text, features="lxml")
+            body = soup.body
 
-        names, ranks, links = _get_winners(body)
+            names, ranks, links = _get_winners(body)
 
-        has_points = False
-        if _is_points(ranks[0]):
-            has_points = True
+            has_points = False
+            if _is_points(ranks[0]):
+                has_points = True
 
-        other_names, other_ranks, other_links = _add_other_decks(body, has_points)
-        names.extend(other_names)
-        ranks.extend(other_ranks)
-        links.extend(other_links)
+            other_names, other_ranks, other_links = _add_other_decks(body, has_points)
+            names.extend(other_names)
+            ranks.extend(other_ranks)
+            links.extend(other_links)
 
-        players = _get_players(body, names)
+            players = _get_players(body, names)
 
-        assert _are_equal_length(names, ranks, players), \
-            "names: " + str(len(names)) \
-            + ", ranks: " + str(len(ranks)) \
-            + ", players: " + str(len(players)) \
-            + ", links: " + str(len(links)) \
-            + " at " + html.url
-        assert _are_equal_length(
-            list(zip(names, ranks, players, links)), names, ranks, players, links)
+            assert _are_equal_length(names, ranks, players), \
+                "names: " + str(len(names)) \
+                + ", ranks: " + str(len(ranks)) \
+                + ", players: " + str(len(players)) \
+                + ", links: " + str(len(links)) \
+                + " at " + html.url
+            assert _are_equal_length(
+                list(zip(names, ranks, players, links)), names, ranks, players, links)
 
-        results.extend(
-            [
-                (html.url, player, link, name, rank)
-                for (player, link, name, rank)
-                in zip(players, links, names, ranks)
-            ]
-        )
+            results.extend(
+                [
+                    (html.url, player, link, name, rank)
+                    for (player, link, name, rank)
+                    in zip(players, links, names, ranks)
+                ]
+            )
 
     return results
 
@@ -189,44 +232,45 @@ def _are_equal_length(*args):
 def update_card_table():
     """Get cards from SETS using the Scryfall API"""
     card_table = []
-    for card_set in SETS:
-        set_url = f"https://api.scryfall.com/cards/search?q=set%3A'{card_set}'"
+    with requests.Session() as this_session:
+        for card_set in SETS:
+            set_url = f"https://api.scryfall.com/cards/search?order=set&unique=art&q=set%3A'{card_set}'+lang%3A'en'"
 
-        card_data_response = requests.get(set_url)
-        card_data_json = card_data_response.json()
-        card_data = card_data_json["data"]
-
-        while card_data_json["has_more"]:
-            next_page = card_data_json["next_page"]
-            card_data_response = requests.get(next_page)
+            card_data_response = this_session.get(set_url)
             card_data_json = card_data_response.json()
-            card_data.extend(card_data_json["data"])
-    
-        for card in card_data:
-            this_card = (
-                card["collector_number"],
-                card["set"],
-                card["name"],
-                int(card["cmc"]),
-                "".join(card["color_identity"]),
-                card["legalities"]["standard"]
-            )
+            card_data = card_data_json["data"]
 
-            # Oracle text & Mana costs are different for cards with two faces...
-            try:
-                oracle_text = card["oracle_text"]
-            except KeyError:
-                oracle_text = " // ".join(face["oracle_text"] for face in card["card_faces"])
+            while card_data_json["has_more"]:
+                next_page = card_data_json["next_page"]
+                card_data_response = requests.get(next_page)
+                card_data_json = card_data_response.json()
+                card_data.extend(card_data_json["data"])
+        
+            for card in card_data:
+                this_card = (
+                    card["collector_number"],
+                    card["set"],
+                    card["name"],
+                    int(card["cmc"]),
+                    "".join(card["color_identity"]),
+                    card["legalities"]["standard"]
+                )
 
-            try:
-                mana_cost = card["mana_cost"]
-            except KeyError:
-                mana_cost = " // ".join(face["mana_cost"] for face in card["card_faces"])
-                if mana_cost == " // ":
-                    mana_cost = ""
+                # Oracle text & Mana costs are different for cards with two faces...
+                try:
+                    oracle_text = card["oracle_text"]
+                except KeyError:
+                    oracle_text = " // ".join(face["oracle_text"] for face in card["card_faces"])
 
-            this_card += (oracle_text, mana_cost)
-            card_table.append(this_card)
+                try:
+                    mana_cost = card["mana_cost"]
+                except KeyError:
+                    mana_cost = " // ".join(face["mana_cost"] for face in card["card_faces"])
+                    if mana_cost == " // ":
+                        mana_cost = ""
+
+                this_card += (oracle_text, mana_cost)
+                card_table.append(this_card)
 
     return card_table
 
@@ -238,30 +282,37 @@ def scrape_deck_lists():
 
     assert len(list(deck_data["id"])) == len(urls), "Mismatched list of decks to urls"
     deck_lists = []
-    for url, deck_id in zip(urls, deck_data["id"]):
-        deck_list_response = requests.get(url)
-        deck_list_soup = BeautifulSoup(deck_list_response.text, features="lxml")
-        deck_list_body = deck_list_soup.body
+    with requests.Session() as this_session:
+        for url, deck_id in zip(urls, deck_data["id"]):
+            deck_list_response = this_session.get(url)
+            deck_list_soup = BeautifulSoup(deck_list_response.text, features="lxml")
+            deck_list_body = deck_list_soup.body
 
-        for item in deck_list_body.find_all("td", class_="G14"):
-            this_card = item.text.strip().split(maxsplit=1)
-            count = this_card[0]
-            assert count.isdigit(), "Count is not a digit - " + deck_list_response.url + " - " + this_card
-            name = this_card[1]
+            for item in deck_list_body.find_all("td", class_="G14"):
+                this_card = item.text.strip().split(maxsplit=1)
+                count = this_card[0]
+                assert count.isdigit(), "Count is not a digit - " + deck_list_response.url + " - " + this_card
+                name = this_card[1]
 
-            this_id = item.find_all("span", class_="L14")[0].get("id")[:-2]
-            slot = this_id[:2]
-            set_name = this_id[2:5]
-            collector_number = this_id[5:]
-            if set_name == "11m":
-                set_name = "m11"
-            if set_name == "10m":
-                set_name = "m10"
-            if set_name == "12m":
-                set_name = "m12"
+                this_id = item.find_all("span", class_="L14")[0].get("id")[:-2]
+                slot = this_id[:2]
+                set_name = this_id[2:5]
+                collector_number = this_id[5:]
+                if set_name == "10m":
+                    set_name = "m10"
+                if set_name == "11m":
+                    set_name = "m11"
+                if set_name == "12m":
+                    set_name = "m12 "
+                if set_name == "13m":
+                    set_name = "m13"
+                if set_name == "14m":
+                    set_name = "m14"
+                if set_name == "15m":
+                    set_name = "m15"
 
-            deck_lists.append(
-                (collector_number+set_name, deck_id, count, slot, )
-            )
+                deck_lists.append(
+                    (collector_number+set_name, deck_id, count, slot, )
+                )
 
     return deck_lists

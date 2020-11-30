@@ -8,14 +8,14 @@ from src.sqldb import SQLDatabase
 URL = "https://www.mtgtop8.com/format?f=ST"
 
 def main():
-    event_table = m.scrape_data_from(URL)
-    deck_data = m.scrape_event_data()
+    # event_table = m.scrape_data_from(URL)
+    # deck_data = m.scrape_event_data()
     save(
         {
-            "card": m.update_card_table(),
-            "event": event_table,
-            "pilot": parse_pilots_from(deck_data),
-            "deck": deck_data,
+            # "card": m.update_card_table(),
+            # "event": event_table,
+            # "pilot": parse_pilots_from(deck_data),
+            # "deck": deck_data,
             "decklist": m.scrape_deck_lists()
         }
     )
