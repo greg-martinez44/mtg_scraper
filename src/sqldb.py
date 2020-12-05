@@ -2,6 +2,15 @@ import os
 import pandas as pd
 import sqlite3
 
+def query(table):
+    with SQLDatabase() as sql_database:
+        return sql_database.get_dataframe_from(table)
+
+
+def commit(data, table):
+    with SQLDatabase() as sql_db:
+        sql_db.union_events(data, table)
+
 
 class SQLDatabase:
     """API for interacting with SQL database."""
