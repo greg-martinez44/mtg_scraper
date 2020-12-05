@@ -4,11 +4,11 @@ import re
 
 from bs4 import BeautifulSoup
 
-from src.Event import Event
 
 @unittest.SkipTest
 class TestResultsFromBeautifulSoup(unittest.TestCase):
     URL = "https://www.mtgtop8.com/format?f=ST"
+
     def setUp(self):
         self.page_source = requests.get(self.URL)
         self.this_source = self.page_source.content
@@ -27,4 +27,3 @@ class TestResultsFromBeautifulSoup(unittest.TestCase):
         stable = this_html.find_all("table", class_="Stable")
         self.assertIsNotNone(stable)
         self.assertIsInstance(stable, list)
-

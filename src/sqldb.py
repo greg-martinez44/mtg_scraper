@@ -2,9 +2,10 @@ import os
 import pandas as pd
 import sqlite3
 
+
 class SQLDatabase:
     """API for interacting with SQL database."""
-    
+
     def __init__(self, db_name=None):
         if db_name is None:
             _path_to_db = os.path.abspath("dbs/links.db")
@@ -74,7 +75,8 @@ class SQLDatabase:
             ).fetchone()[0]
             items_to_insert = item[2:]
             try:
-                self._cursor.execute(query, (event_id, pilot_id) + items_to_insert)
+                self._cursor.execute(
+                    query, (event_id, pilot_id) + items_to_insert)
             except sqlite3.IntegrityError:
                 pass
 
@@ -100,7 +102,11 @@ class SQLDatabase:
 
     def get_dataframe_from(self, table):
         query = f"SELECT * FROM {table}"
-        return pd.read_sql(query, self._connection)
+        result = pd.read_sql(query, self._connection)
+        if "date" in result.columns.tolist():
+            result["date"] = pd.to_datetime(result["date"], dayfirst=True)
+        return result
+
 
 if __name__ == "__main__":
     print(os.path.abspath("dbs/links.db"))

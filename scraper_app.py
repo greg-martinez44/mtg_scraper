@@ -1,11 +1,13 @@
+from src.main import main as start_scraping
 import os
 import tkinter as tk
 from tkinter import ttk
 
-import sys; sys.path.append("/Users/gregmartinez/projects/mtg_scraper")
-from src.main import main as start_scraping
+import sys
+sys.path.append("/Users/gregmartinez/projects/mtg_scraper")
 
 CARDBACK = os.path.join(os.path.dirname(__file__), "images/magic_card.png")
+
 
 class LabelInput(tk.Frame):
     def __init__(
@@ -17,7 +19,7 @@ class LabelInput(tk.Frame):
         input_args=None,
         label_args=None,
         **kwargs
-        ):
+    ):
         super().__init__(parent, **kwargs)
         input_args = input_args or {}
         label_args = label_args or {}
@@ -72,61 +74,12 @@ class LabelInput(tk.Frame):
             self.input.delete(0, tk.END)
             self.input.insert(0, value)
 
-# class ScraperAppFrame(tk.Frame):
-#     def __init__(self, parent, *args, **kwargs):
-#         super().__init__(parent, *args, **kwargs)
-
-#         self.inputs = {}
-#         self.build_scraper()
-#         self.build_closer()
-
-#         self.reset()
-
-#     def build_scraper(self):
-#         scraper_frame = tk.LabelFrame(self, text="Scraper")
-#         image = tk.PhotoImage(name="card", file=CARDBACK, height=470, width=335)
-#         self.inputs["scraper_button"] = LabelInput(
-#             scraper_frame,
-#             input_class=tk.Button,
-#             input_args={
-#                 "command": self.on_click,
-#                 "image": image
-#                 }
-#             )
-#         self.inputs["scraper_button"].grid(row=0, column=0)
-#         scraper_frame.grid(row=0, column=0)
-
-#     def build_closer(self):
-#         closer_frame = tk.LabelFrame(self)
-#         self.inputs["close_button"] = LabelInput(
-#             closer_frame,
-#             input_class=tk.Button,
-#             input_args={
-#                 "command": self.destroy,
-#                 "text": "Close"
-#                 }
-#             )
-#         self.inputs["close_button"].grid(row=0, column=0)
-#         closer_frame.grid(row=1, column=0)
-
-#     def get(self):
-#         return {key: widget.get() for key, widget in self.inputs.items()}
-
-#     def reset(self):
-#         for widget in self.inputs:
-#             self.inputs[widget].set("")
-
-#     def on_click(self):
-#         start_scraping()
-
-#     def destroy(self):
-#         super().destroy
-
 
 class ScraperApp(tk.Tk):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.image = tk.PhotoImage(name="card", file=CARDBACK, height=470, width=335),
+        self.image = tk.PhotoImage(
+            name="card", file=CARDBACK, height=470, width=335),
 
         self.title("MTG Top 8 Scraper")
 
@@ -134,7 +87,7 @@ class ScraperApp(tk.Tk):
             self,
             text="MTG Top 8 Scraper",
             font=("TkDefaultFont", 16)
-            ).grid(row=0)
+        ).grid(row=0)
 
         app_frame = tk.Frame(self)
         tk.Button(
@@ -142,13 +95,13 @@ class ScraperApp(tk.Tk):
             text="scraper",
             image=self.image,
             command=self.on_click
-            ).grid(row=0)
+        ).grid(row=0)
 
         tk.Button(
             app_frame,
             text="Close",
             command=super().destroy
-            ).grid(row=1)
+        ).grid(row=1)
 
         app_frame.grid(row=1)
 

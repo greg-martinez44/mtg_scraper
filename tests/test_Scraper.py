@@ -5,9 +5,11 @@ from selenium.common.exceptions import (
     InvalidArgumentException,
 )
 
-from src.Scraper import Scraper, _Scraper
+from src.Scraper import Scraper
+from src import models as m
 
 URL = "https://www.mtgtop8.com/format?f=ST"
+
 
 class TestDriver(unittest.TestCase):
 
@@ -66,8 +68,8 @@ class TestDriverWithBadInputsDefaultExceptions(unittest.TestCase):
         self.assertFalse(result)
 
 
+@unittest.SkipTest
 class TestGettingSpecificElements(unittest.TestCase):
-
 
     def test_should_give_all_tables_with_class_Stable(self):
         with Scraper(URL) as scraper:
@@ -108,7 +110,8 @@ class TestGettingSpecificElements(unittest.TestCase):
 
     def test_find_one_row_of_stable_with_xpath(self):
         with Scraper(URL) as scraper:
-            result = scraper.get_by("xpath", "//table[@class='Stable'][2]//tr[@class='hover_tr']//a")
+            result = scraper.get_by(
+                "xpath", "//table[@class='Stable'][2]//tr[@class='hover_tr']//a")
             self.assertEqual(len(result), 1)
             # self.assertEqual("Japan Championship 2020 Autumn - Last Chance Trial @ BIG Magic", result[0].text)
             # self.assertIn("event?e=27876&f=ST", result[0].get_attribute("href"))
@@ -117,7 +120,7 @@ class TestGettingSpecificElements(unittest.TestCase):
         with Scraper(URL) as scraper:
             results = scraper.get_all_by(
                 "xpath", "//table[@class='Stable'][2]//tr[@class='hover_tr']//a"
-                )
+            )
             self.assertEqual(len(results), 10)
             # events = [item.text for item in results]
             # links = [item.get_attribute("href") for item in results]
@@ -139,19 +142,28 @@ class TestGettingSpecificElements(unittest.TestCase):
 
     def test_xpath_finds_dates(self):
         with Scraper(URL) as scraper:
-            result = scraper.get_by("xpath", "//table[@class='Stable'][2]//tr[@class='hover_tr']//td[@class='S10']")
+            result = scraper.get_by(
+                "xpath", "//table[@class='Stable'][2]//tr[@class='hover_tr']//td[@class='S10']")
             self.assertEqual(result[0].text, '30/10/20')
 
-class TestWithContextManager(unittest.TestCase):
-
-    def test_should_return_scraper_object(self):
-        with Scraper(URL) as scraper:
-            self.assertIsInstance(scraper, _Scraper)
 
 class TestRepr(unittest.TestCase):
 
     def test_should_print_page_source(self):
         with Scraper(URL) as scraper:
             print(scraper)
+
+
+class TestUpdater(unittest.TestCase):
+
+    def test_new_method_works(self):
+        updater = m.Updater()
+        updater.update_events_from(URL)
+
+    def test_new_deck_update(self):
+        updater = m.Updater()
+        updater.update_decks()
+
+
 if __name__ == "__main__":
     unittest.main()
