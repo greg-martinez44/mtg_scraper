@@ -8,28 +8,10 @@ from src.sqldb import SQLDatabase
 URL = "https://www.mtgtop8.com/format?f=ST"
 
 def main():
-    # event_table = m.scrape_data_from(URL)
-    # deck_data = m.scrape_event_data()
-    save(
-        {
-            # "card": m.update_card_table(),
-            # "event": event_table,
-            # "pilot": parse_pilots_from(deck_data),
-            # "deck": deck_data,
-            "decklist": m.scrape_deck_lists()
-        }
-    )
-
-def save(data):
-    with SQLDatabase() as sql_db:
-        for table in data:
-            sql_db.union_events(data[table], table)
-
-def parse_pilots_from(deck_data):
-    player_table = []
-    for item in deck_data:
-        player_table.append(item[1].split(maxsplit=1))
-    return player_table
+    updater = m.Updater()
+    updater.update_events(URL)
+    updater.update_decks_and_players()
+    updater.update_deck_lists()
 
 if __name__ == "__main__":
     main()
