@@ -2,6 +2,7 @@ import os
 import pandas as pd
 import sqlite3
 
+
 def query(table):
     with SQLDatabase() as sql_database:
         return sql_database.get_dataframe_from(table)
@@ -41,6 +42,7 @@ class SQLDatabase:
         self._connection.commit()
 
     def add_new(self, item, table):
+        """Factory for building correct sql calls to the appropriate table"""
         if table == "event":
             try:
                 self._cursor.execute(
@@ -110,6 +112,7 @@ class SQLDatabase:
                 pass
 
     def get_dataframe_from(self, table):
+        """Grabs all the data from a table and returns a dataframe"""
         query = f"SELECT * FROM {table}"
         result = pd.read_sql(query, self._connection)
         if "date" in result.columns.tolist():

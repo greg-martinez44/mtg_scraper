@@ -11,33 +11,51 @@ URL = "https://www.mtgtop8.com/format?f=ST"
 
 
 class Updater:
+    """Wrapper class to call other update objects"""
+
     def __init__(self):
         pass
 
     def update_events(self, url):
+        """
+        Gets a list from the Sqlite file with all the events from the most recent update.
+        This list is used to determine how far the EventScraper object needs to go to get all the new events
+        from mtgtop8. It then commits the new events to the Sqlite table.
+        """
         currently_saved_events = query("event")
         latest_events = list(
             currently_saved_events.loc[
-                currently_saved_events["date"] == currently_saved_events["date"].max()
-                ]["link"]
-            )
+                currently_saved_events["date"] == currently_saved_events["date"].max(
+                )
+            ]["link"]
+        )
         scraper = EventScraper(url, latest_events)
         new_events = scraper.update()
         commit(new_events, "event")
 
     def update_cards(self):
+        """
+        Updates all the card definitions from scryfall.
+        This is a fresh update of all data every time it is run, since older cards are not entirely static.
+        Run this sparingly - in the case of a new ban, a new set release, or rotation.
+        """
         scraper = CardScraper()
         new_cards = scraper.update()
         commit(new_cards, "card")
         return
 
     def update_decks_and_players(self):
+        """
+        Grabs the new data (where the event id is not in the deck table) and makes a DeckPlayer scraper to retrieve it.
+        These two are combined because 'Players' and 'Decks' are scraped from the same locaiton, at the same time.
+        """
         currently_saved_events = query("event")
         currently_saved_decks = query("deck")
         currently_saved_players = query("pilot")
         new_events = list(
             currently_saved_events.loc[
-                ~(currently_saved_events["id"].isin(currently_saved_decks["eventId"]))
+                ~(currently_saved_events["id"].isin(
+                    currently_saved_decks["eventId"]))
             ]["link"]
         )
         scraper = DeckPlayerScraper(new_events, currently_saved_players)
@@ -47,18 +65,27 @@ class Updater:
         return
 
     def update_deck_lists(self):
+        """Gets all the new decks from recent update and scrapes the deck lists."""
         currently_saved_decks = query("deck")
-        scraper = DeckListScraper(currently_saved_decks)
+        currently_saved_deck_lists = query("decklist")
+        new_links = currently_saved_decks.loc[
+            ~(currently_saved_decks["id"].isin(
+                currently_saved_deck_lists["deckId"]))
+        ]
+        scraper = DeckListScraper(new_links)
         new_deck_lists = scraper.update()
         commit(new_deck_lists, "decklist")
 
 
 class PageScraper:
+    """Abstract base class for scraper objects"""
 
     def update(self):
         pass
 
+
 class EventScraper(PageScraper):
+    """Handles updating Events"""
 
     def __init__(self, url, latest_events):
         self.url = url
@@ -104,7 +131,10 @@ class EventScraper(PageScraper):
         for old_link in self.latest_events:
             return old_link in new_links
 
+
 class DeckPlayerScraper(PageScraper):
+    """Handles updating Deck and Pilot"""
+
     def __init__(self, new_events, currently_saved_players):
         self.new_events = new_events
         self.currently_saved_players = currently_saved_players
@@ -132,7 +162,7 @@ class DeckPlayerScraper(PageScraper):
                 links.extend(other_links)
 
                 players = self._get_players(body, names)
-                new_players.extend(self.check_new_players(players))
+                new_players.extend(self._check_new_players(players))
 
                 assert self._are_equal_length(names, ranks, players), \
                     "names: " + str(len(names)) \
@@ -153,7 +183,12 @@ class DeckPlayerScraper(PageScraper):
 
             return result, new_players
 
+    # HELPER FUNCTIONS
     def _get_winners(self, body):
+        """
+        Gets first place deck/pilot; mtgtop8 has different tags for the winner 
+        when you navigate to a new event page
+        """
         try:
             winner_rank = body.find_all("div", class_="W12")[1].text
             winner_name = body.find_all("div", class_="W14")[0].find("a").text
@@ -168,6 +203,7 @@ class DeckPlayerScraper(PageScraper):
             return [winner_name], [winner_rank], [winner_link]
 
     def _add_other_decks(self, body, has_points=False):
+        """Gets the rest of the deck/pilot data from the event page"""
         names = []
         ranks = []
         links = []
@@ -200,35 +236,46 @@ class DeckPlayerScraper(PageScraper):
                     links.append(this_link)
         return names, ranks, links
 
-    def check_new_players(self, players):
+    def _check_new_players(self, players):
+        """Looks at the players on the page and filters for only new players"""
         new_players = []
         for player in players:
-            if player not in list(self.currently_saved_players["firstName"] + " " + self.currently_saved_players["lastName"]):
+            if player not in list(
+                self.currently_saved_players["firstName"] + " "
+                + self.currently_saved_players["lastName"]
+            ):
                 new_players.append(player)
         return [player.split(maxsplit=1) for player in new_players]
 
     def _get_players(self, body, names):
+        """Gets all the players from the page"""
         result = []
         for player in body.find_all("div", class_="G11")[:len(names)]:
             result.append(player.find("a").text)
         return result
 
     def _is_malformed(self, name):
+        """Assertion for misformed deck titles"""
         return re.match("^\$[0-9]*\ \(.*\)$", name) or re.match("^[0-9]*\ TIX$", name)
 
     def _is_a_link(self, link):
+        """Assertion for collecting deck links"""
         return re.match("^\?e=.*&d=.*&f=ST", link)
 
     def _should_be_skipped(self, rank):
+        """Assertion for odd/extraneous cards, based on mtgtop8 formatting"""
         return rank == "close" or rank == "Companion card"
 
     def _is_points(self, rank):
+        """Assertion for identifying if an event is measured by points"""
         return re.match("^[0-9]*\ pts$", rank)
 
     def _is_rank(self, rank):
+        """Assertion for identifying if an event is measured by rank"""
         return re.match("^[0-9]*-[0-9]*$", rank) or re.match("^[0-9]*$", rank)
 
     def _are_equal_length(self, *args):
+        """Assertion for equal length lists to avoid data loss"""
         equal = True
         length1 = len(args[0])
         for arg in args:
@@ -236,9 +283,12 @@ class DeckPlayerScraper(PageScraper):
                 equal = False
         return equal
 
+
 class CardScraper(PageScraper):
+    """Handles updating Card table from Scryfall"""
 
     def __init__(self):
+        # Definition of all the sets to capture
         self.SETS = [
             "eld", "thb", "iko", "m21", "znr",
             "war", "rna", "grn", "m20", "mor",
@@ -257,7 +307,8 @@ class CardScraper(PageScraper):
         card_table = []
         with requests.Session() as this_session:
             for card_set in self.SETS:
-                set_url = f"https://api.scryfall.com/cards/search?order=set&unique=art&q=set%3A'{card_set}'+lang%3A'en'"
+                set_url = \
+                    f"https://api.scryfall.com/cards/search?order=set&unique=art&q=set%3A'{card_set}'+lang%3A'en'"
 
                 card_data_response = this_session.get(set_url)
                 card_data_json = card_data_response.json()
@@ -284,7 +335,7 @@ class CardScraper(PageScraper):
                         oracle_text = card["oracle_text"]
                     except KeyError:
                         oracle_text = " // ".join(face["oracle_text"]
-                                                for face in card["card_faces"])
+                                                  for face in card["card_faces"])
 
                     try:
                         mana_cost = card["mana_cost"]
@@ -299,19 +350,21 @@ class CardScraper(PageScraper):
 
         return card_table
 
-class DeckListScraper(PageScraper):
 
-    def __init__(self, currently_saved_decks):
-        self.currently_saved_decks = currently_saved_decks
+class DeckListScraper(PageScraper):
+    """Handles updating DeckList"""
+
+    def __init__(self, new_links):
+        self.new_links = new_links
         ROOT_URL = "https://www.mtgtop8.com/event"
-        self.urls = ROOT_URL + self.currently_saved_decks["deckUrl"]
+        self.urls = ROOT_URL + self.new_links["deckUrl"]
 
     def update(self):
-        assert len(list(self.currently_saved_decks["id"])) == len(
+        assert len(list(self.new_links["id"])) == len(
             self.urls), "Mismatched list of decks to urls"
         deck_lists = []
         with requests.Session() as this_session:
-            for url, deck_id in zip(self.urls, self.currently_saved_decks["id"]):
+            for url, deck_id in zip(self.urls, self.new_links["id"]):
                 deck_list_response = this_session.get(url)
                 deck_list_soup = BeautifulSoup(
                     deck_list_response.text, features="lxml")
@@ -323,7 +376,8 @@ class DeckListScraper(PageScraper):
                     assert count.isdigit(), "Count is not a digit - " + \
                         deck_list_response.url + " - " + this_card
 
-                    this_id = item.find_all("span", class_="L14")[0].get("id")[:-2]
+                    this_id = item.find_all("span", class_="L14")[
+                        0].get("id")[:-2]
                     slot = this_id[:2]
                     set_name = this_id[2:5]
                     collector_number = this_id[5:]
