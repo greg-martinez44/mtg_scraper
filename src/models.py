@@ -300,7 +300,7 @@ class CardScraper(PageScraper):
             "mbs", "mh1", "mrd", "ogw", "ori",
             "rav", "rix", "roe", "rtr", "sha",
             "soi", "som", "ths", "tsp", "xln",
-            "zen"
+            "zen", "kld"
         ]
 
     def update(self):
