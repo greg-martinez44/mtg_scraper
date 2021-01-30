@@ -135,4 +135,4 @@ dmypy.json
 
 .DS*
 *.csv
-*.db
+**.db
