@@ -136,3 +136,5 @@ dmypy.json
 .DS*
 *.csv
 **.db
+dbs/links.db
+geckodriver.log

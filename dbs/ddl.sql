@@ -37,5 +37,6 @@ CREATE TABLE IF NOT EXISTS deckList (
     deckId INTEGER,
     count INTEGER,
     slot TEXT,
+    cardName TEXT,
     FOREIGN KEY (deckId) REFERENCES deck(id)
 );

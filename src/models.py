@@ -38,6 +38,7 @@ class Updater:
         Updates all the card definitions from scryfall.
         This is a fresh update of all data every time it is run, since older cards are not entirely static.
         Run this sparingly - in the case of a new ban, a new set release, or rotation.
+
         """
         scraper = CardScraper()
         new_cards = scraper.update()
@@ -289,19 +290,27 @@ class CardScraper(PageScraper):
 
     def __init__(self):
         # Definition of all the sets to capture
+        # self.SETS = [
+        #     "eld", "thb", "iko", "m21", "znr",
+        #     "war", "rna", "grn", "m20", "mor",
+        #     "frf", "m11", "m12", "m10", "m13",
+        #     "m19", "m14", "m15", "aer", "akh",
+        #     "bng", "chk", "dar", "dis", "dka",
+        #     "dom", "emn", "gtc", "hou", "ice",
+        #     "inv", "isd", "jou", "ktk", "leg",
+        #     "mbs", "mh1", "mrd", "ogw", "ori",
+        #     "rav", "rix", "roe", "rtr", "sha",
+        #     "soi", "som", "ths", "tsp", "xln",
+        #     "zen", "kld", "khm"
+        # ]
         self.SETS = [
-            "eld", "thb", "iko", "m21", "znr",
-            "war", "rna", "grn", "m20", "mor",
-            "frf", "m11", "m12", "m10", "m13",
-            "m19", "m14", "m15", "aer", "akh",
-            "bng", "chk", "dar", "dis", "dka",
-            "dom", "emn", "gtc", "hou", "ice",
-            "inv", "isd", "jou", "ktk", "leg",
-            "mbs", "mh1", "mrd", "ogw", "ori",
-            "rav", "rix", "roe", "rtr", "sha",
-            "soi", "som", "ths", "tsp", "xln",
-            "zen", "kld", "khm"
-        ]
+            "khm",
+            "znr",
+            "iko",
+            "thb",
+            "m21",
+            "eld"
+            ]
 
     def update(self):
         card_table = []
@@ -394,8 +403,9 @@ class DeckListScraper(PageScraper):
                     if set_name == "15m":
                         set_name = "m15"
 
+                    card_name = item.find_all("span", class_="L14")[0].text
                     deck_lists.append(
-                        (collector_number+set_name, deck_id, count, slot, )
+                        (collector_number+set_name, deck_id, count, slot, card_name )
                     )
 
         return deck_lists

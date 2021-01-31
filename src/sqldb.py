@@ -93,8 +93,8 @@ class SQLDatabase:
 
         elif table == "decklist":
             query = """
-            INSERT INTO deckList (cardId, deckId, count, slot)
-            VALUES (?, ?, ?, ?)
+            INSERT INTO deckList (cardId, deckId, count, slot, cardName)
+            VALUES (?, ?, ?, ?, ?)
             """
             try:
                 self._cursor.execute(query, item)
