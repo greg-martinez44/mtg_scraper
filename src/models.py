@@ -290,34 +290,26 @@ class CardScraper(PageScraper):
 
     def __init__(self):
         # Definition of all the sets to capture
-        # self.SETS = [
-        #     "eld", "thb", "iko", "m21", "znr",
-        #     "war", "rna", "grn", "m20", "mor",
-        #     "frf", "m11", "m12", "m10", "m13",
-        #     "m19", "m14", "m15", "aer", "akh",
-        #     "bng", "chk", "dar", "dis", "dka",
-        #     "dom", "emn", "gtc", "hou", "ice",
-        #     "inv", "isd", "jou", "ktk", "leg",
-        #     "mbs", "mh1", "mrd", "ogw", "ori",
-        #     "rav", "rix", "roe", "rtr", "sha",
-        #     "soi", "som", "ths", "tsp", "xln",
-        #     "zen", "kld", "khm"
-        # ]
         self.SETS = [
-            "khm",
-            "znr",
-            "iko",
-            "thb",
-            "m21",
-            "eld"
-            ]
+            "eld", "thb", "iko", "m21", "znr",
+            "war", "rna", "grn", "m20", "mor",
+            "frf", "m11", "m12", "m10", "m13",
+            "m19", "m14", "m15", "aer", "akh",
+            "bng", "chk", "dar", "dis", "dka",
+            "dom", "emn", "gtc", "hou", "ice",
+            "inv", "isd", "jou", "ktk", "leg",
+            "mbs", "mh1", "mrd", "ogw", "ori",
+            "rav", "rix", "roe", "rtr", "sha",
+            "soi", "som", "ths", "tsp", "xln",
+            "zen", "kld", "khm"
+        ]
 
     def update(self):
         card_table = []
         with requests.Session() as this_session:
             for card_set in self.SETS:
                 set_url = \
-                    f"https://api.scryfall.com/cards/search?order=set&unique=art&q=set%3A'{card_set}'+lang%3A'en'"
+                    f"https://api.scryfall.com/cards/search?order=set&unique=prints&q=set%3A'{card_set}'+lang%3A'en'"
 
                 card_data_response = this_session.get(set_url)
                 card_data_json = card_data_response.json()
