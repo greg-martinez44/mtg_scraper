@@ -138,3 +138,5 @@ dmypy.json
 **.db
 dbs/links.db
 geckodriver.log
+
+*.pdf
