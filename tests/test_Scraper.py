@@ -45,7 +45,7 @@ class TestDriver(unittest.TestCase):
             stable = scraper.get_by("css", "table.Stable")
         self.assertNotIn("Nav_PN_no", stable)
 
-    @unittest.SkipTest
+    @unittest.skip("Out of Date")
     def test_first_page_should_have_this_event_title(self):
         event_title = "FNM @ Deckmaster Games"
         with Scraper(URL) as scraper:
@@ -68,7 +68,7 @@ class TestDriverWithBadInputsDefaultExceptions(unittest.TestCase):
         self.assertFalse(result)
 
 
-@unittest.SkipTest
+@unittest.skip("Out of Date")
 class TestGettingSpecificElements(unittest.TestCase):
 
     def test_should_give_all_tables_with_class_Stable(self):
@@ -154,6 +154,7 @@ class TestRepr(unittest.TestCase):
             print(scraper)
 
 
+unittest.skip("Integration Tests")
 class TestUpdater(unittest.TestCase):
 
     def test_new_method_works(self):

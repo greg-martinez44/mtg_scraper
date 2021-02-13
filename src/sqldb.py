@@ -37,6 +37,7 @@ class SQLDatabase:
         self._connection.close()
 
     def union_events(self, data, table):
+        """Adds items to a table"""
         for item in data:
             self.add_new(item, table)
         self._connection.commit()
@@ -44,72 +45,112 @@ class SQLDatabase:
     def add_new(self, item, table):
         """Factory for building correct sql calls to the appropriate table"""
         if table == "event":
-            try:
-                self._cursor.execute(
-                    """
-                    INSERT INTO event (name, link, date)
-                    VALUES (?, ?, ?)
-                    """, item
+            self.add_events(item)
+
+        if table == "pilot":
+            self.add_pilots(item)
+
+        if table == "deck":
+            self.add_decks(item)
+
+        if table == "decklist":
+            self.add_deck_lists(item)
+
+        if table == "card":
+            self.add_cards(item)
+
+    def add_events(self, item):
+        try:
+            self._cursor.execute(
+                """
+                INSERT INTO event (name, link, date)
+                VALUES (?, ?, ?)
+                """, item
                 )
-            except sqlite3.IntegrityError:
-                pass
+        except sqlite3.IntegrityError:
+            pass
 
-        elif table == "pilot":
-            if len(item) == 1:
-                item += [""]
-            try:
-                self._cursor.execute(
-                    """
-                    INSERT INTO pilot (firstName, lastName)
-                    values (?, ?)
-                    """, item
+    def add_pilots(self, item):
+        """
+        Add pilots to the sql table. 
+        If only one name is provided (e.g. an Arena username), add a second element ot
+        the list to match lastName.
+        """
+        if len(item) == 1:
+            item += [""]
+        try:
+            self._cursor.execute(
+                """
+                INSERT INTO pilot (firstName, lastName)
+                VALUES (?, ?)
+                """, item
                 )
-            except sqlite3.IntegrityError:
-                pass
+        except sqlite3.IntegrityError:
+            pass
 
-        elif table == "deck":
-            query = """
-            INSERT INTO deck (eventId, pilotId, deckUrl, name, rank)
-            VALUES (?, ?, ?, ?, ?)
+    def add_decks(self, item):
+        event_id = self.get_event_id(item[0])
+        pilot_id = self.get_pilot_id(item[1])
+        items_to_insert = item[2:]
+        try:
+            self._cursor.execute(
+                """
+                INSERT INTO deck (eventId, pilotId, deckUrl, name, rank)
+                VALUES (?, ?, ?, ?, ?)
+                """,
+                (event_id, pilot_id) + items_to_insert
+                )
+        except sqlite3.IntegrityError:
+            pass
+
+    def get_event_id(self, link):
+        return self._cursor.execute(
             """
-            event_id = self._cursor.execute("""
-                SELECT id
-                FROM event
-                WHERE link = ?
-                """, (item[0], )
+            SELECT id
+            FROM event
+            WHERE link = ?
+            """, (link,)
             ).fetchone()[0]
-            pilot_id = self._cursor.execute("""
-                SELECT id
-                FROM pilot
-                WHERE (firstName || lastName) = ?
-                """, ("".join(item[1].split(maxsplit=1)),)
+
+    def get_pilot_id(self, name):
+        first_last = "".join(name.split(maxsplit=1))
+        return self._cursor.execute(
+            """
+            SELECT id
+            FROM pilot
+            WHERE (firstName || lastName) = ?
+            """, (first_last,)
             ).fetchone()[0]
-            items_to_insert = item[2:]
-            try:
-                self._cursor.execute(
-                    query, (event_id, pilot_id) + items_to_insert)
-            except sqlite3.IntegrityError:
-                pass
 
-        elif table == "decklist":
-            query = """
-            INSERT INTO deckList (cardId, deckId, count, slot, cardName)
-            VALUES (?, ?, ?, ?, ?)
-            """
-            try:
-                self._cursor.execute(query, item)
-            except sqlite3.IntegrityError:
-                pass
+    def add_deck_lists(self, item):
+        try:
+            self._cursor.execute(
+                """
+                INSERT INTO deckList (cardId, deckId, count, slot, cardName)
+                VALUES (?, ?, ?, ?, ?)
+                """, item
+                )
+        except sqlite3.IntegrityError:
+            pass
 
-        elif table == "card":
-            query = """
-            INSERT INTO card (setNumber, setName, name, cmc, color, standardLegality, oracle_text, mana_cost)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            """
-            try:
-                self._cursor.execute(query, item)
-            except sqlite3.IntegrityError:
-                pass
+    def add_cards(self, item):
+        try:
+            self._cursor.execute(
+                """
+                INSERT INTO card (
+                    setNumber,
+                    setName,
+                    name,
+                    cmc,
+                    color,
+                    standardLegality,
+                    oracle_text,
+                    mana_cost)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                """, item
+                )
+        except sqlite3.IntegrityError:
+            pass
 
     def get_dataframe_from(self, table):
         """Grabs all the data from a table and returns a dataframe"""

@@ -94,7 +94,7 @@ class EventScraper(PageScraper):
 
     def update(self):
         with Scraper(self.url) as scraper:
-            page = 1
+            page = 0
             result = self._get_page(scraper)
             next_page = True
             up_to_date = False
