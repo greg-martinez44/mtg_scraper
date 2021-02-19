@@ -43,7 +43,10 @@ ID_ARCHETYPE_MAP = {
     2757: "control",
     2975: "aggro",
     3020: "aggro",
-    3024: "aggro"
+    3024: "aggro",
+    3199: "aggro",
+    3201: "control",
+    3202: "aggro"
     }
 
 CATEGORY_MAP = {

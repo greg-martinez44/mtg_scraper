@@ -112,6 +112,52 @@ def save_to_disk(**kwargs):
     for table in kwargs:
         kwargs[table].to_csv(f"flat_files/{table}.csv", index=False)
 
+def check_missing_archetype(table):
+    missing = table[table["archetype"].isna()]
+    if missing.empty:
+        print("No missing archetypes.")
+    else:
+        for idx, row in missing.iterrows():
+            print(f"Deck ID {row['deckId']} is missing an archetype.")
+            print(f"Check {row['deckUrl']} for correct value.")
+
+
+def check_missing_category(table):
+    missing = table[table["category"].isna()]
+    if missing.empty:
+        print("No missing categories.")
+    else:
+        for idx, row in missing.iterrows():
+            print(f"Deck ID {row['deckId']} is missing an category.")
+            print(f"Check {row['deckUrl']} for correct value.")
+
+def check_unmatched_card_ids(table, card_table, deck_table):
+    unmatched = table[~table["cardId"].isin(card_table["cardId"])]
+    if unmatched.empty:
+        print("No unmatched cardIds.")
+    else:
+        for idx, row in unmatched.iterrows():
+            if row["cardId"] != "":
+                print(f"Card ID {row['cardId']} is unmatched in the card table.")
+                print(f"Check {deck_table[deck_table['deckId'] == row['deckId']]['deckUrl']} for the offending code.")
+
+def check_wrong_sets(table):
+    standard_sets = "eld|thb|znr|iko|khm|m21"
+    non_standard_sets = table[
+        (~table["cardId"].str.contains(standard_sets, regex=True))
+        & (table["date"] >= "2020-09-29")
+        ][["cardId", "name"]].drop_duplicates()
+    if non_standard_sets.empty:
+        print("All sets are correct.")
+    if len(non_standard_sets) == 2 and \
+    (non_standard_sets.reset_index()["name"] == pd.Series(["Midnight Reaper", "Murder"])).all():
+        print("All sets are correct, besides the usual suspects (Midnight Reaper and Murder).")
+    else:
+        for idx, row in non_standard_sets:
+            print(f"The CardId {row['cardId']} needs further investigation - {row['deckUrl']}")
+
+
+
 if __name__ == "__main__":
     update(URL)
 
@@ -152,6 +198,11 @@ if __name__ == "__main__":
         )
 
     fix_wrong_names(full_table, ID_SPEC_MAP)
+
+    check_missing_archetype(deck_table)
+    check_missing_category(deck_table)
+    check_unmatched_card_ids(deck_list_table, card_table, deck_table)
+    check_wrong_sets(full_table)
 
     save_to_disk(
         full_table=full_table,
