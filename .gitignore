@@ -139,4 +139,5 @@ dmypy.json
 dbs/links.db
 geckodriver.log
 
+**/pylint_logs
 *.pdf
