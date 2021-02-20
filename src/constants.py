@@ -274,3 +274,17 @@ ID_SPEC_MAP = {
     "306ice": ("284khm", "Snow-Covered Forest", ""),
     "309ice": ("277khm", "Snow-Covered Plains", "")
     }
+
+SETS = [
+    "eld", "thb", "iko", "m21", "znr",
+    "war", "rna", "grn", "m20", "mor",
+    "frf", "m11", "m12", "m10", "m13",
+    "m19", "m14", "m15", "aer", "akh",
+    "bng", "chk", "dar", "dis", "dka",
+    "dom", "emn", "gtc", "hou", "ice",
+    "inv", "isd", "jou", "ktk", "leg",
+    "mbs", "mh1", "mrd", "ogw", "ori",
+    "rav", "rix", "roe", "rtr", "sha",
+    "soi", "som", "ths", "tsp", "xln",
+    "zen", "kld", "khm"
+]

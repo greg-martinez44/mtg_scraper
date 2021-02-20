@@ -25,10 +25,9 @@ from src.sqldb import SQLDatabase
 
 def update(url):
     """Update tables from mtgtop8.com"""
-    updater = m.Updater()
-    updater.update_events(url)
-    updater.update_decks_and_players()
-    updater.update_deck_lists()
+    m.update_events(url)
+    m.update_decks_and_players()
+    m.update_deck_lists()
 
 def clean_dates(df, dayfirst=True):
     """Cast date column to datetime objects"""
@@ -38,39 +37,39 @@ def rename_id_column(df, new_id, inplace=True):
     """Fix id column names"""
     df.rename(columns={"id": new_id}, inplace=inplace)
 
-def add_card_id(card_table):
+def add_card_id(table):
     "Adds a card id (number + name) to the card table"
-    card_table["setNumber"] = card_table["setNumber"].str.zfill(3)
-    card_table["cardId"] = card_table["setNumber"] + card_table["setName"]
+    table["setNumber"] = table["setNumber"].str.zfill(3)
+    table["cardId"] = table["setNumber"] + table["setName"]
 
-def fix_deck_names(deck_table, id_name_map):
+def fix_deck_names(table, id_name_map):
     """Replaces weird deck names with sensical ones."""
     for deck_id, deck_name in id_name_map.items():
-        deck_table.loc[deck_table["deckId"] == deck_id, "name"] = deck_name
+        table.loc[table["deckId"] == deck_id, "name"] = deck_name
 
-def set_archetypes(deck_table, archetype_map, **kwargs):
+def set_archetypes(table, archetype_map, **kwargs):
     """Add archetype based on either keywords in the name of the deck, the id, or specifc name."""
     for archetype, flags in archetype_map.items():
         for flag in flags:
-            deck_table.loc[
-                deck_table["name"].str.contains(flag, case=False),
+            table.loc[
+                table["name"].str.contains(flag, case=False),
                 "archetype"
             ] = archetype
     if kwargs.get("id_archetype_map", None):
         for deck_id, archetype in kwargs["id_archetype_map"].items():
-            deck_table.loc[deck_table["deckId"] == deck_id, "archetype"] = archetype
+            table.loc[table["deckId"] == deck_id, "archetype"] = archetype
     if kwargs.get("name_archetype_map", None):
         for deck_name, archetype in kwargs["name_archetype_map"].items():
-            deck_table.loc[deck_table["name"] == deck_name, "archetype"] = archetype
+            table.loc[table["name"] == deck_name, "archetype"] = archetype
 
-def set_categories(deck_table, category_map, **kwargs):
+def set_categories(table, category_map, **kwargs):
     """Add category based on either keywords in the name of the deck or id."""
     for category, flags in category_map.items():
         for flag in flags:
-            deck_table.loc[deck_table["name"].str.contains(flag, case=False), "category"] = category
+            table.loc[table["name"].str.contains(flag, case=False), "category"] = category
     if kwargs.get("id_category_map", None):
         for deck_id, category in kwargs["id_category_map"].items():
-            deck_table.loc[deck_table["deckId"] == deck_id, "category"] = category
+            table.loc[table["deckId"] == deck_id, "category"] = category
 
 def fix_abu_codes(table, abu_map, inplace=True):
     """Fixes 'abu' codes in mtgtop8's HTML code."""
@@ -126,7 +125,7 @@ def make_full_table(**kwargs):
         suffixes=[None, "_decklist"]
         ).drop_duplicates()
 
-    full_table = pd.merge(
+    result = pd.merge(
         events_decks_pilots_deck_list,
         kwargs["card_table"],
         on="cardId",
@@ -134,7 +133,7 @@ def make_full_table(**kwargs):
         )
 
     return (
-        full_table[FULL_TABLE_COLUMNS]
+        result[FULL_TABLE_COLUMNS]
         .drop_duplicates()
         .sort_values(by=["eventId", "deckId", "slot"])
         .reset_index(drop=True)
@@ -181,15 +180,15 @@ def check_missing_category(table):
             print(f"Deck ID {row['deckId']} is missing an category.")
             print(f"Check {row['deckUrl']} for correct value.")
 
-def check_unmatched_card_ids(table, card_table, deck_table):
+def check_unmatched_card_ids(table, cards, decks):
     """Prints URLS for decks with cards that do not, for some reason, show up in the card table."""
-    unmatched = table[~table["cardId"].isin(card_table["cardId"])]
+    unmatched = table[~table["cardId"].isin(cards["cardId"])]
     if unmatched.empty:
         print("No unmatched cardIds.")
     else:
         for _, row in unmatched.iterrows():
             if row["cardId"] != "":
-                bad_url = deck_table[deck_table["deckId"] == row["deckId"]]["deckUrl"]
+                bad_url = decks[decks["deckId"] == row["deckId"]]["deckUrl"]
                 print(f"Card ID {row['cardId']} is unmatched in the card table.")
                 print(f"Check {bad_url} for the offending code.")
 
