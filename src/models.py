@@ -6,7 +6,7 @@ import requests
 from bs4 import BeautifulSoup
 
 from src.constants import SETS, URL
-from src.Scraper import Scraper
+from src.scraper import Scraper
 from src.sqldb import query, commit
 from src.data_assertions import (
     is_up_to_date,
@@ -154,12 +154,36 @@ def add_other_decks(body, has_points=False):
                 links.append(this_link)
     return names, ranks, links
 
+def get_html_body(session, link):
+    """Get data from link's html"""
+    html = session.get(link)
+    soup = BeautifulSoup(html.text, features="lxml")
+    return soup.body, html.url
+
+def get_json_body(session, url):
+    "Gets data from link's json response"
+    response = session.get(url)
+    json = response.json()
+    data = json["data"]
+
+    while json["has_more"]:
+        next_page = json["next_page"]
+        response = session.get(next_page)
+        json = response.json()
+        data.extend(json["data"])
+
+    return data
+
 class PageScraper:
     """Abstract base class for scraper objects"""
 
     def update(self):
         """To be overwritten with specific update function."""
         return
+
+    def check_previous(self, new_data):
+        """Checks if scrapped data is new or old"""
+        return new_data
 
 
 class EventScraper(PageScraper):
@@ -170,6 +194,7 @@ class EventScraper(PageScraper):
         self.latest_events = latest_events
 
     def update(self):
+        """Traverse the mtgtop8 page and get new events."""
         with Scraper(self.url) as scraper:
             page = 0
             result = get_page(scraper)
@@ -183,8 +208,16 @@ class EventScraper(PageScraper):
                 result.extend(get_page(scraper))
                 time.sleep(2)
                 next_page = "Nav_PN_no" not in str(scraper)
-                up_to_date = is_up_to_date(result, self.latest_events)
+                up_to_date = self.check_previous(result)
             return result
+
+    def check_previous(self, new_data):
+        """
+        Returns True if the second page should be looked at, otherwise
+        the update ends.
+        """
+        return is_up_to_date(new_data, self.latest_events)
+
 
 class DeckPlayerScraper(PageScraper):
     """Handles updating Deck and Pilot"""
@@ -199,9 +232,7 @@ class DeckPlayerScraper(PageScraper):
         with requests.Session() as this_session:
             for link in self.new_events:
                 print("updating " + link)
-                html = this_session.get(link)
-                soup = BeautifulSoup(html.text, features="lxml")
-                body = soup.body
+                body, url = get_html_body(this_session, link)
 
                 names, ranks, links = get_winners(body)
 
@@ -216,26 +247,32 @@ class DeckPlayerScraper(PageScraper):
                 links.extend(other_links)
 
                 players = get_players(body, names)
-                new_players.extend(check_new_players(players, self.currently_saved_players))
+                new_players.extend(self.check_previous(players))
 
                 assert are_equal_length(names, ranks, players), \
                     "names: " + str(len(names)) \
                     + ", ranks: " + str(len(ranks)) \
                     + ", players: " + str(len(players)) \
                     + ", links: " + str(len(links)) \
-                    + " at " + html.url
+                    + " at " + url
                 assert are_equal_length(
                     list(zip(names, ranks, players, links)), names, ranks, players, links)
 
                 result.extend(
                     [
-                        (html.url, player, link, name, rank)
+                        (url, player, link, name, rank)
                         for (player, link, name, rank)
                         in zip(players, links, names, ranks)
                     ]
                 )
 
             return result, new_players
+
+    def check_previous(self, new_data):
+        """
+        Returns players that are not new list of players.
+        """
+        return check_new_players(new_data, self.currently_saved_players)
 
 class CardScraper(PageScraper):
     """Handles updating Card table from Scryfall"""
@@ -253,15 +290,7 @@ class CardScraper(PageScraper):
                     + f"'{card_set}'+lang%3A'en'"
                 )
 
-                card_data_response = this_session.get(set_url)
-                card_data_json = card_data_response.json()
-                card_data = card_data_json["data"]
-
-                while card_data_json["has_more"]:
-                    next_page = card_data_json["next_page"]
-                    card_data_response = requests.get(next_page)
-                    card_data_json = card_data_response.json()
-                    card_data.extend(card_data_json["data"])
+                card_data = get_json_body(this_session, set_url)
 
                 for card in card_data:
                     this_card = (
@@ -308,16 +337,13 @@ class DeckListScraper(PageScraper):
         deck_lists = []
         with requests.Session() as this_session:
             for url, deck_id in zip(self.urls, self.new_links["id"]):
-                deck_list_response = this_session.get(url)
-                deck_list_soup = BeautifulSoup(
-                    deck_list_response.text, features="lxml")
-                deck_list_body = deck_list_soup.body
+                deck_list_body, deck_url = get_html_body(this_session, url)
 
                 for item in deck_list_body.find_all("td", class_="G14"):
                     this_card = item.text.strip().split(maxsplit=1)
                     count = this_card[0]
                     assert count.isdigit(), "Count is not a digit - " + \
-                        deck_list_response.url + " - " + this_card
+                        deck_url + " - " + this_card
 
                     this_id = item.find_all("span", class_="L14")[
                         0].get("id")[:-2]

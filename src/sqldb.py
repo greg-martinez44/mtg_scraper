@@ -1,14 +1,20 @@
+"""
+Methods for interacting with SQL database
+"""
+
 import os
-import pandas as pd
 import sqlite3
+import pandas as pd
 
 
 def query(table):
+    """Returns a dataframe with data in a sql table"""
     with SQLDatabase() as sql_database:
         return sql_database.get_dataframe_from(table)
 
 
 def commit(data, table):
+    """Adds data to a sql table"""
     with SQLDatabase() as sql_db:
         sql_db.union_events(data, table)
 
@@ -17,6 +23,7 @@ class SQLDatabase:
     """API for interacting with SQL database."""
 
     def __init__(self, db_name=None):
+        """Establishes connection to the sql table"""
         if db_name is None:
             _path_to_db = os.path.abspath("dbs/links.db")
         else:
@@ -28,12 +35,15 @@ class SQLDatabase:
             raise ValueError("Bad Connection")
 
     def __enter__(self):
+        """Method for entering SQLDatabase object as context manager"""
         return self
 
     def __exit__(self, *args):
+        """Method for closing the SQL connection as context manager"""
         self.close()
 
     def close(self):
+        """Closes the SQL connection"""
         self._connection.close()
 
     def union_events(self, data, table):
@@ -60,6 +70,7 @@ class SQLDatabase:
             self.add_cards(item)
 
     def add_events(self, item):
+        """Adds events to the events table"""
         try:
             self._cursor.execute(
                 """
@@ -72,7 +83,7 @@ class SQLDatabase:
 
     def add_pilots(self, item):
         """
-        Add pilots to the sql table. 
+        Add pilots to the sql table.
         If only one name is provided (e.g. an Arena username), add a second element ot
         the list to match lastName.
         """
@@ -89,6 +100,7 @@ class SQLDatabase:
             pass
 
     def add_decks(self, item):
+        """Adds decks to the deck table"""
         event_id = self.get_event_id(item[0])
         pilot_id = self.get_pilot_id(item[1])
         items_to_insert = item[2:]
@@ -104,6 +116,10 @@ class SQLDatabase:
             pass
 
     def get_event_id(self, link):
+        """
+        Returns event ids from event table.
+        Used to get foreign key for deck table.
+        """
         return self._cursor.execute(
             """
             SELECT id
@@ -113,6 +129,10 @@ class SQLDatabase:
             ).fetchone()[0]
 
     def get_pilot_id(self, name):
+        """
+        Returns pilot ids from pilot table.
+        Used to get foreign key for deck table.
+        """
         first_last = "".join(name.split(maxsplit=1))
         return self._cursor.execute(
             """
@@ -123,6 +143,7 @@ class SQLDatabase:
             ).fetchone()[0]
 
     def add_deck_lists(self, item):
+        """Adds deck lists to the deck list table"""
         try:
             self._cursor.execute(
                 """
@@ -134,6 +155,7 @@ class SQLDatabase:
             pass
 
     def add_cards(self, item):
+        """Adds cards to the cards table."""
         try:
             self._cursor.execute(
                 """
@@ -154,8 +176,7 @@ class SQLDatabase:
 
     def get_dataframe_from(self, table):
         """Grabs all the data from a table and returns a dataframe"""
-        query = f"SELECT * FROM {table}"
-        result = pd.read_sql(query, self._connection)
+        result = pd.read_sql(f"SELECT * FROM {table}", self._connection)
         if "date" in result.columns.tolist():
             result["date"] = pd.to_datetime(result["date"], dayfirst=True)
         return result
