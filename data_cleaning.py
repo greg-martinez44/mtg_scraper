@@ -1,6 +1,8 @@
 """
 Download and clean known bad data points for MTG standard tournament scene inspection
 """
+
+import logging
 import pandas as pd
 
 from src.constants import (
@@ -22,6 +24,12 @@ from src.constants import (
     )
 import src.models as m
 from src.sqldb import SQLDatabase
+
+logging.basicConfig(
+    filename="main_output.log",
+    level=logging.DEBUG,
+    format="%(asctime)s %(message)s"
+    )
 
 def update(url):
     """Update tables from mtgtop8.com"""
@@ -56,9 +64,11 @@ def set_archetypes(table, archetype_map, **kwargs):
                 "archetype"
             ] = archetype
     if kwargs.get("id_archetype_map", None):
+        logging.debug("Had to fix archetypes by id")
         for deck_id, archetype in kwargs["id_archetype_map"].items():
             table.loc[table["deckId"] == deck_id, "archetype"] = archetype
     if kwargs.get("name_archetype_map", None):
+        logging.debug("Had to fix archetypes by deck name")
         for deck_name, archetype in kwargs["name_archetype_map"].items():
             table.loc[table["name"] == deck_name, "archetype"] = archetype
 
@@ -68,6 +78,7 @@ def set_categories(table, category_map, **kwargs):
         for flag in flags:
             table.loc[table["name"].str.contains(flag, case=False), "category"] = category
     if kwargs.get("id_category_map", None):
+        logging.debug("Had to fix categories by deck id")
         for deck_id, category in kwargs["id_category_map"].items():
             table.loc[table["deckId"] == deck_id, "category"] = category
 
@@ -273,3 +284,5 @@ if __name__ == "__main__":
         card_table=card_table,
         pilot_table=pilot_table
         )
+
+    logging.info("All tables saved")

@@ -288,3 +288,5 @@ SETS = [
     "soi", "som", "ths", "tsp", "xln",
     "zen", "kld", "khm"
 ]
+
+FLAT_FILE_DIR = "/Users/gregmartinez/projects/mtg_scraper/flat_files"
