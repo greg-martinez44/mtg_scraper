@@ -209,15 +209,16 @@ def check_wrong_sets(table):
     non_standard_sets = table[
         (~table["cardId"].str.contains(standard_sets, regex=True))
         & (table["date"] >= "2020-09-29")
-        ][["cardId", "name"]].drop_duplicates()
+        ][["cardId", "name", "deckId"]].drop_duplicates()
     if non_standard_sets.empty:
         print("All sets are correct.")
     if len(non_standard_sets) == 2 and \
     (non_standard_sets.reset_index()["name"] == pd.Series(["Midnight Reaper", "Murder"])).all():
         print("All sets are correct, besides the usual suspects (Midnight Reaper and Murder).")
     else:
-        for _, row in non_standard_sets:
-            print(f"The CardId {row['cardId']} needs further investigation - {row['deckUrl']}")
+        for _, row in non_standard_sets.iterrows():
+            urls_to_check = deck_table[deck_table["deckId"] == row["deckId"]]["deckUrl"].values[0]
+            print(f"The CardId {row['cardId']} needs further investigation - {urls_to_check}")
 
 
 
