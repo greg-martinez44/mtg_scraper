@@ -132,6 +132,8 @@ dmypy.json
 
 #latex files
 *.aux
+*.dvi
+*.tex
 
 
 .DS*

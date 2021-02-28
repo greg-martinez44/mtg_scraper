@@ -1,5 +1,6 @@
 """
-Download and clean known bad data points for MTG standard tournament scene inspection
+Download and clean known bad data points for MTG standard tournament
+scene inspection
 """
 
 import logging
@@ -25,11 +26,6 @@ from src.constants import (
 import src.models as m
 from src.sqldb import SQLDatabase
 
-logging.basicConfig(
-    filename="main_output.log",
-    level=logging.DEBUG,
-    format="%(asctime)s %(message)s"
-    )
 
 def update(url):
     """Update tables from mtgtop8.com"""
@@ -56,7 +52,8 @@ def fix_deck_names(table, id_name_map):
         table.loc[table["deckId"] == deck_id, "name"] = deck_name
 
 def set_archetypes(table, archetype_map, **kwargs):
-    """Add archetype based on either keywords in the name of the deck, the id, or specifc name."""
+    """Add archetype based on either keywords in the name of the deck,
+    the id, or specifc name."""
     for archetype, flags in archetype_map.items():
         for flag in flags:
             table.loc[
@@ -76,7 +73,10 @@ def set_categories(table, category_map, **kwargs):
     """Add category based on either keywords in the name of the deck or id."""
     for category, flags in category_map.items():
         for flag in flags:
-            table.loc[table["name"].str.contains(flag, case=False), "category"] = category
+            table.loc[
+                table["name"].str.contains(flag, case=False),
+                "category"
+            ] = category
     if kwargs.get("id_category_map", None):
         logging.debug("Had to fix categories by deck id")
         for deck_id, category in kwargs["id_category_map"].items():
@@ -87,11 +87,17 @@ def fix_abu_codes(table, abu_map, inplace=True):
     table["cardId"].replace(to_replace=abu_map, inplace=inplace)
 
 def fix_broken_codes(table, broken_code_map, inplace=True):
-    """Some card codes in mtgtop8's HTML are from old sets; this fixes them to be more recent"""
+    """
+    Some card codes in mtgtop8's HTML are from old sets;
+    this fixes them to be more recent.
+    """
     table["cardId"].replace(to_replace=broken_code_map, inplace=inplace)
 
 def set_latest_release(table):
-    """Adds a label column for which set was most recently released at the time of the event."""
+    """
+    Adds a label column for which set was most recently released at
+    the time of the event.
+    """
     table.loc[table["date"] < ZENDIKAR_RELEASE, "latest_set"] = "Ikoria"
     table.loc[
         (table["date"] >= ZENDIKAR_RELEASE)
@@ -192,7 +198,10 @@ def check_missing_category(table):
             print(f"Check {row['deckUrl']} for correct value.")
 
 def check_unmatched_card_ids(table, cards, decks):
-    """Prints URLS for decks with cards that do not, for some reason, show up in the card table."""
+    """
+    Prints URLS for decks with cards that do not, for some reason,
+    show up in the card table.
+    """
     unmatched = table[~table["cardId"].isin(cards["cardId"])]
     if unmatched.empty:
         print("No unmatched cardIds.")
@@ -200,11 +209,16 @@ def check_unmatched_card_ids(table, cards, decks):
         for _, row in unmatched.iterrows():
             if row["cardId"] != "":
                 bad_url = decks[decks["deckId"] == row["deckId"]]["deckUrl"]
-                print(f"Card ID {row['cardId']} is unmatched in the card table.")
+                print(
+                    f"Card ID {row['cardId']} is unmatched in the card table."
+                )
                 print(f"Check {bad_url} for the offending code.")
 
 def check_wrong_sets(table):
-    """Prints URLs for decks that have cards outside of the standard sets for spot checking."""
+    """
+    Prints URLs for decks that have cards outside of the standard sets
+    for spot checking.
+    """
     standard_sets = "eld|thb|znr|iko|khm|m21"
     non_standard_sets = table[
         (~table["cardId"].str.contains(standard_sets, regex=True))
@@ -212,17 +226,37 @@ def check_wrong_sets(table):
         ][["cardId", "name", "deckId"]].drop_duplicates()
     if non_standard_sets.empty:
         print("All sets are correct.")
-    if len(non_standard_sets) == 2 and \
-    (non_standard_sets.reset_index()["name"] == pd.Series(["Midnight Reaper", "Murder"])).all():
-        print("All sets are correct, besides the usual suspects (Midnight Reaper and Murder).")
+    if len(non_standard_sets) == 2 and  (
+        (non_standard_sets
+        .reset_index()["name"]
+        .values
+        .tolist()) == ["Midnight Reaper", "Murder"]
+        ):
+        print(
+            "All sets are correct, besides the usual"
+            "suspects (Midnight Reaper and Murder)."
+        )
     else:
         for _, row in non_standard_sets.iterrows():
-            urls_to_check = deck_table[deck_table["deckId"] == row["deckId"]]["deckUrl"].values[0]
-            print(f"The CardId {row['cardId']} needs further investigation - {urls_to_check}")
+            urls_to_check = deck_table[
+                deck_table["deckId"] == row["deckId"]
+            ]["deckUrl"].values[0]
+            print(
+                f"The CardId {row['cardId']} needs further"
+                f"investigation - {urls_to_check}"
+            )
 
 
 
-if __name__ == "__main__":
+def main():
+    """The main runner of the script"""
+
+    logging.basicConfig(
+        filename="main_output.log",
+        level=logging.DEBUG,
+        format="%(asctime)s %(message)s"
+        )
+
     update(URL)
 
     with SQLDatabase() as sql_db:
@@ -287,3 +321,6 @@ if __name__ == "__main__":
         )
 
     logging.info("All tables saved")
+
+if __name__ == "__main__":
+    main()

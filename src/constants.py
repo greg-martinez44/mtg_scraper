@@ -47,7 +47,8 @@ ID_ARCHETYPE_MAP = {
     3199: "aggro",
     3201: "control",
     3202: "aggro",
-    3347: "aggro"
+    3347: "aggro",
+    3390: "control"
     }
 
 CATEGORY_MAP = {
@@ -198,7 +199,8 @@ BROKEN_CODE_MAP = {
     "037ktk": "054khm",
     "075war": "085m21",
     "100kld": "128znr",
-    "007ktk": "015m21"
+    "007ktk": "015m21",
+    "093rna": "134m21"
     }
 
 RANK_MAP = {
