@@ -214,7 +214,7 @@ def check_unmatched_card_ids(table, cards, decks):
                 )
                 print(f"Check {bad_url} for the offending code.")
 
-def check_wrong_sets(table):
+def check_wrong_sets(table, a_deck_table):
     """
     Prints URLs for decks that have cards outside of the standard sets
     for spot checking.
@@ -238,8 +238,8 @@ def check_wrong_sets(table):
         )
     else:
         for _, row in non_standard_sets.iterrows():
-            urls_to_check = deck_table[
-                deck_table["deckId"] == row["deckId"]
+            urls_to_check = a_deck_table[
+                a_deck_table["deckId"] == row["deckId"]
             ]["deckUrl"].values[0]
             print(
                 f"The CardId {row['cardId']} needs further"
@@ -309,7 +309,7 @@ def main():
     check_missing_archetype(deck_table)
     check_missing_category(deck_table)
     check_unmatched_card_ids(deck_list_table, card_table, deck_table)
-    check_wrong_sets(full_table)
+    check_wrong_sets(full_table, deck_table)
 
     save_to_disk(
         full_table=full_table,

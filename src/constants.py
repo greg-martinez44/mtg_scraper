@@ -48,7 +48,11 @@ ID_ARCHETYPE_MAP = {
     3201: "control",
     3202: "aggro",
     3347: "aggro",
-    3390: "control"
+    3390: "control",
+    3624: "aggro",
+    3626: "control",
+    3673: "aggro",
+    3678: "aggro"
     }
 
 CATEGORY_MAP = {
@@ -66,7 +70,7 @@ CATEGORY_MAP = {
     "simic": ["simic", " ug "],
     "rakdos": ["rakdos", "br", "rb"],
     "golgari": ["golgari", "bg", "gb"],
-    "gruul": ["gruul", "rg"],
+    "gruul": ["gruul", "rg", "grull"],
     "bant": ["bant", "gwu", "guw", "ugw", "uwg", "wgu", "wug"],
     "esper": ["esper", "wub"],
     "grixis": ["grixis"],
@@ -84,7 +88,9 @@ CATEGORY_MAP = {
 
 ID_CATEGORY_MAP = {
     360: "gruul",
-    1063: "4-color"
+    1063: "4-color",
+    3568: "4-color",
+    3625: "mono white"
     }
 
 ABU_MAP = {
@@ -200,7 +206,8 @@ BROKEN_CODE_MAP = {
     "075war": "085m21",
     "100kld": "128znr",
     "007ktk": "015m21",
-    "093rna": "134m21"
+    "093rna": "134m21",
+    "205dom": "147khm"
     }
 
 RANK_MAP = {
