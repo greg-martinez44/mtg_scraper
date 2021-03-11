@@ -3,6 +3,7 @@ Download and clean known bad data points for MTG standard tournament
 scene inspection
 """
 
+import json
 import logging
 import pandas as pd
 
@@ -10,22 +11,42 @@ from src.constants import (
     URL,
     ZENDIKAR_RELEASE,
     KALDHEIM_RELEASE,
-    ID_NAME_MAP,
-    ARCHETYPE_MAP,
-    NAME_ARCHETYPE_MAP,
-    ID_ARCHETYPE_MAP,
-    CATEGORY_MAP,
-    ID_CATEGORY_MAP,
-    ABU_MAP,
-    BROKEN_CODE_MAP,
-    RANK_MAP,
-    COMPOSITE_RANK_MAP,
-    FULL_TABLE_COLUMNS,
-    ID_SPEC_MAP
+    FULL_TABLE_COLUMNS
     )
 import src.models as m
 from src.sqldb import SQLDatabase
 
+def load_json_data():
+    with open("/Users/gregmartinez/projects/mtg_scraper/src/data/maps.json", "r") as json_file:
+        out = json.load(json_file)
+    return out
+
+
+new_data = {
+    "archetype_maps": {
+        "id_map":{
+            }
+        },
+    "category_maps": {
+        "id_map":{
+            }
+        },
+    "broken_code_map": {
+        },
+    "id_spec_map": {
+        }
+    }
+def update_json_data(new_data):
+    with open("/Users/gregmartinez/projects/mtg_scraper/src/data/maps.json", "r") as json_file:
+        current_data = json.load(json_file)
+
+    current_data["archetype_maps"]["id_map"].update(new_data["archetype_maps"]["id_map"])
+    current_data["category_maps"]["id_map"].update(new_data["category_maps"]["id_map"])
+    current_data["broken_code_map"].update(new_data["broken_code_map"])
+    current_data["id_spec_map"].update(new_data["id_spec_map"])
+
+    with open("/Users/gregmartinez/projects/mtg_scraper/src/data/maps.json", "w") as json_file:
+        json.dump(current_data, json_file)
 
 def update(url):
     """Update tables from mtgtop8.com"""
@@ -49,6 +70,7 @@ def add_card_id(table):
 def fix_deck_names(table, id_name_map):
     """Replaces weird deck names with sensical ones."""
     for deck_id, deck_name in id_name_map.items():
+        deck_id = int(deck_id)
         table.loc[table["deckId"] == deck_id, "name"] = deck_name
 
 def set_archetypes(table, archetype_map, **kwargs):
@@ -63,6 +85,7 @@ def set_archetypes(table, archetype_map, **kwargs):
     if kwargs.get("id_archetype_map", None):
         logging.debug("Had to fix archetypes by id")
         for deck_id, archetype in kwargs["id_archetype_map"].items():
+            deck_id = int(deck_id)
             table.loc[table["deckId"] == deck_id, "archetype"] = archetype
     if kwargs.get("name_archetype_map", None):
         logging.debug("Had to fix archetypes by deck name")
@@ -80,6 +103,7 @@ def set_categories(table, category_map, **kwargs):
     if kwargs.get("id_category_map", None):
         logging.debug("Had to fix categories by deck id")
         for deck_id, category in kwargs["id_category_map"].items():
+            deck_id = int(deck_id)
             table.loc[table["deckId"] == deck_id, "category"] = category
 
 def fix_abu_codes(table, abu_map, inplace=True):
@@ -109,6 +133,7 @@ def set_latest_release(table):
 def fix_rankings(table, ranking_map, composite_ranks=None):
     """Replaces point systems with rough approximations of the player's rank."""
     for event_id, rank_conversion in ranking_map.items():
+        event_id = int(event_id)
         for pts, rank in rank_conversion:
             table.loc[
                 (table["rank"] == pts)
@@ -179,8 +204,12 @@ def check_missing_archetype(table):
         print("No missing archetypes.")
     else:
         for _, row in missing.iterrows():
-            print(f"Deck ID {row['deckId']} is missing an archetype.")
+            bad_deck_id = row["deckId"]
+            print(f"Deck ID {bad_deck_id} is missing an archetype.")
             print(f"Check {row['deckUrl']} for correct value.")
+            new_value = input("Enter the correct archetype: ")
+            new_data["archetype_maps"]["id_map"].update({bad_deck_id: new_value})
+
 
 
 def check_missing_category(table):
@@ -194,8 +223,11 @@ def check_missing_category(table):
         print("No missing categories.")
     else:
         for _, row in missing.iterrows():
+            bad_deck_id = row["deckId"]
             print(f"Deck ID {row['deckId']} is missing an category.")
             print(f"Check {row['deckUrl']} for correct value.")
+            new_value = input("Enter the correct category: ")
+            new_data["category_maps"]["id_map"].update({bad_deck_id: new_value})
 
 def check_unmatched_card_ids(table, cards, decks):
     """
@@ -208,11 +240,14 @@ def check_unmatched_card_ids(table, cards, decks):
     else:
         for _, row in unmatched.iterrows():
             if row["cardId"] != "":
+                bad_card_id = row["cardId"]
                 bad_url = decks[decks["deckId"] == row["deckId"]]["deckUrl"]
                 print(
-                    f"Card ID {row['cardId']} is unmatched in the card table."
+                    f"Card ID {bad_card_id} is unmatched in the card table."
                 )
                 print(f"Check {bad_url} for the offending code.")
+                new_value = input("Enter the correct cardId: ")
+                new_data["broken_code_map"].update({bad_card_id: new_value})
 
 def check_wrong_sets(table, a_deck_table):
     """
@@ -238,15 +273,16 @@ def check_wrong_sets(table, a_deck_table):
         )
     else:
         for _, row in non_standard_sets.iterrows():
+            bad_card_id = row["cardId"]
             urls_to_check = a_deck_table[
                 a_deck_table["deckId"] == row["deckId"]
             ]["deckUrl"].values[0]
             print(
-                f"The CardId {row['cardId']} needs further"
+                f"The CardId {bad_card_id} needs further"
                 f"investigation - {urls_to_check}"
             )
-
-
+            new_value = input("Enter the corect values '[new_card_id, 'Name', 'color or empty string']': ")
+            new_data["id_spec_map"].update({bad_card_id: new_value})
 
 def main():
     """The main runner of the script"""
@@ -275,26 +311,31 @@ def main():
 
     add_card_id(card_table)
 
-    fix_deck_names(deck_table, ID_NAME_MAP)
+    data_maps = load_json_data()
+
+    fix_deck_names(deck_table, data_maps["id_names"])
 
     set_archetypes(
         deck_table,
-        ARCHETYPE_MAP,
-        id_archetype_map=ID_ARCHETYPE_MAP,
-        name_archetype_map=NAME_ARCHETYPE_MAP
+        data_maps["archetype_maps"]["base_map"],
+        id_archetype_map=data_maps["archetype_maps"]["id_map"],
+        name_archetype_map=data_maps["archetype_maps"]["name_map"]
     )
     set_categories(
         deck_table,
-        CATEGORY_MAP,
-        id_category_map=ID_CATEGORY_MAP
+        data_maps["category_maps"]["base_map"],
+        id_category_map=data_maps["category_maps"]["id_map"]
     )
 
-    fix_abu_codes(card_table, ABU_MAP)
-    fix_abu_codes(deck_list_table, ABU_MAP)
-    fix_broken_codes(deck_list_table, BROKEN_CODE_MAP)
+    fix_abu_codes(card_table, data_maps["abu_map"])
+    fix_abu_codes(deck_list_table, data_maps["abu_map"])
+    fix_broken_codes(deck_list_table, data_maps["broken_code_map"])
 
 
-    fix_rankings(deck_table, RANK_MAP, composite_ranks=COMPOSITE_RANK_MAP)
+    fix_rankings(
+        deck_table,
+        data_maps["rank_map"]["base_map"],
+        composite_ranks=data_maps["rank_map"]["composite_map"])
 
     full_table = make_full_table(
         event_table=event_table,
@@ -304,7 +345,7 @@ def main():
         card_table=card_table
         )
 
-    fix_wrong_names(full_table, ID_SPEC_MAP)
+    fix_wrong_names(full_table, data_maps["id_spec_map"])
 
     check_missing_archetype(deck_table)
     check_missing_category(deck_table)
@@ -321,6 +362,8 @@ def main():
         )
 
     logging.info("All tables saved")
+    
+    update_json_data(new_data)
 
 if __name__ == "__main__":
     main()
