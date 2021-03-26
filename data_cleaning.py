@@ -206,7 +206,7 @@ def check_missing_archetype(table):
         for _, row in missing.iterrows():
             bad_deck_id = row["deckId"]
             print(f"Deck ID {bad_deck_id} is missing an archetype.")
-            print(f"Check {row['deckUrl']} for correct value.")
+            print(f"Check https://www.mtgtop8.com/event{row['deckUrl']} for correct value.")
             new_value = input("Enter the correct archetype: ")
             new_data["archetype_maps"]["id_map"].update({bad_deck_id: new_value})
 
@@ -225,7 +225,7 @@ def check_missing_category(table):
         for _, row in missing.iterrows():
             bad_deck_id = row["deckId"]
             print(f"Deck ID {row['deckId']} is missing an category.")
-            print(f"Check {row['deckUrl']} for correct value.")
+            print(f"Check https://www.mtgtop8.com/event{row['deckUrl']} for correct value.")
             new_value = input("Enter the correct category: ")
             new_data["category_maps"]["id_map"].update({bad_deck_id: new_value})
 
@@ -279,7 +279,7 @@ def check_wrong_sets(table, a_deck_table):
             ]["deckUrl"].values[0]
             print(
                 f"The CardId {bad_card_id} needs further"
-                f"investigation - {urls_to_check}"
+                f"investigation - https://www.mtgtop8.com/event{urls_to_check}"
             )
             new_value = input("Enter the corect values '[new_card_id, 'Name', 'color or empty string']': ")
             new_data["id_spec_map"].update({bad_card_id: new_value})
