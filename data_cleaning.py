@@ -16,12 +16,6 @@ from src.constants import (
 import src.models as m
 from src.sqldb import SQLDatabase
 
-def load_json_data():
-    with open("/Users/gregmartinez/projects/mtg_scraper/src/data/maps.json", "r") as json_file:
-        out = json.load(json_file)
-    return out
-
-
 new_data = {
     "archetype_maps": {
         "id_map":{
@@ -36,7 +30,15 @@ new_data = {
     "id_spec_map": {
         }
     }
+
+def load_json_data():
+    with open("/Users/gregmartinez/projects/mtg_scraper/src/data/maps.json", "r") as json_file:
+        out = json.load(json_file)
+    return out
+
 def update_json_data(new_data):
+    """Updates json file with new spot fixes for oddly defined decks"""
+
     with open("/Users/gregmartinez/projects/mtg_scraper/src/data/maps.json", "r") as json_file:
         current_data = json.load(json_file)
 
@@ -50,32 +52,39 @@ def update_json_data(new_data):
 
 def update(url):
     """Update tables from mtgtop8.com"""
+
     m.update_events(url)
     m.update_decks_and_players()
     m.update_deck_lists()
 
 def clean_dates(df, dayfirst=True):
     """Cast date column to datetime objects"""
+
     df["date"] = pd.to_datetime(df["date"], dayfirst=dayfirst)
 
 def rename_id_column(df, new_id, inplace=True):
     """Fix id column names"""
+
     df.rename(columns={"id": new_id}, inplace=inplace)
 
 def add_card_id(table):
     "Adds a card id (number + name) to the card table"
+
     table["setNumber"] = table["setNumber"].str.zfill(3)
     table["cardId"] = table["setNumber"] + table["setName"]
 
 def fix_deck_names(table, id_name_map):
     """Replaces weird deck names with sensical ones."""
+
     for deck_id, deck_name in id_name_map.items():
-        deck_id = int(deck_id)
-        table.loc[table["deckId"] == deck_id, "name"] = deck_name
+        table.loc[table["deckId"] == int(deck_id), "name"] = deck_name
 
 def set_archetypes(table, archetype_map, **kwargs):
-    """Add archetype based on either keywords in the name of the deck,
-    the id, or specifc name."""
+    """
+    Add archetype based on either keywords in the name of the deck,
+    the id, or specifc name.
+    """
+
     for archetype, flags in archetype_map.items():
         for flag in flags:
             table.loc[
@@ -85,8 +94,7 @@ def set_archetypes(table, archetype_map, **kwargs):
     if kwargs.get("id_archetype_map", None):
         logging.debug("Had to fix archetypes by id")
         for deck_id, archetype in kwargs["id_archetype_map"].items():
-            deck_id = int(deck_id)
-            table.loc[table["deckId"] == deck_id, "archetype"] = archetype
+            table.loc[table["deckId"] == int(deck_id), "archetype"] = archetype
     if kwargs.get("name_archetype_map", None):
         logging.debug("Had to fix archetypes by deck name")
         for deck_name, archetype in kwargs["name_archetype_map"].items():
@@ -94,6 +102,7 @@ def set_archetypes(table, archetype_map, **kwargs):
 
 def set_categories(table, category_map, **kwargs):
     """Add category based on either keywords in the name of the deck or id."""
+
     for category, flags in category_map.items():
         for flag in flags:
             table.loc[
@@ -103,11 +112,11 @@ def set_categories(table, category_map, **kwargs):
     if kwargs.get("id_category_map", None):
         logging.debug("Had to fix categories by deck id")
         for deck_id, category in kwargs["id_category_map"].items():
-            deck_id = int(deck_id)
-            table.loc[table["deckId"] == deck_id, "category"] = category
+            table.loc[table["deckId"] == int(deck_id), "category"] = category
 
 def fix_abu_codes(table, abu_map, inplace=True):
     """Fixes 'abu' codes in mtgtop8's HTML code."""
+
     table["cardId"].replace(to_replace=abu_map, inplace=inplace)
 
 def fix_broken_codes(table, broken_code_map, inplace=True):
@@ -115,6 +124,7 @@ def fix_broken_codes(table, broken_code_map, inplace=True):
     Some card codes in mtgtop8's HTML are from old sets;
     this fixes them to be more recent.
     """
+
     table["cardId"].replace(to_replace=broken_code_map, inplace=inplace)
 
 def set_latest_release(table):
@@ -122,6 +132,7 @@ def set_latest_release(table):
     Adds a label column for which set was most recently released at
     the time of the event.
     """
+
     table.loc[table["date"] < ZENDIKAR_RELEASE, "latest_set"] = "Ikoria"
     table.loc[
         (table["date"] >= ZENDIKAR_RELEASE)
@@ -146,6 +157,7 @@ def fix_rankings(table, ranking_map, composite_ranks=None):
 
 def make_full_table(**kwargs):
     """Merges all tables into one 'full table'"""
+
     events_and_decks = pd.merge(
         kwargs["event_table"],
         kwargs["deck_table"],
@@ -183,13 +195,15 @@ def make_full_table(**kwargs):
 
 def fix_wrong_names(table, id_specs_map):
     """Spot fixes weird deck names"""
+
     for card_id, specs in id_specs_map.items():
+        table.loc[table["cardId"] == card_id, "cardId"] = specs[0]
         table.loc[table["cardId"] == card_id, "name"] = specs[1]
         table.loc[table["cardId"] == card_id, "color"] = specs[2]
-        table.loc[table["cardId"] == card_id, "cardId"] = specs[0]
 
 def save_to_disk(**kwargs):
     """Saves all tables to separate csv files"""
+
     for table in kwargs:
         kwargs[table].to_csv(f"flat_files/{table}.csv", index=False)
 
@@ -199,6 +213,7 @@ def check_missing_archetype(table):
     The deckUrl is printed so that the correct archetype can be added through
     either the ID_ARCHETYPE_MAP or NAME_ARCHETYPE_MAP
     """
+
     missing = table[table["archetype"].isna()]
     if missing.empty:
         print("No missing archetypes.")
@@ -218,6 +233,7 @@ def check_missing_category(table):
     The deckUrl is printed so that the correct archetype can be added through
     either the ID_CATEGORY_MAP.
     """
+
     missing = table[table["category"].isna()]
     if missing.empty:
         print("No missing categories.")
@@ -234,6 +250,7 @@ def check_unmatched_card_ids(table, cards, decks):
     Prints URLS for decks with cards that do not, for some reason,
     show up in the card table.
     """
+
     unmatched = table[~table["cardId"].isin(cards["cardId"])]
     if unmatched.empty:
         print("No unmatched cardIds.")
@@ -254,6 +271,7 @@ def check_wrong_sets(table, a_deck_table):
     Prints URLs for decks that have cards outside of the standard sets
     for spot checking.
     """
+
     standard_sets = "eld|thb|znr|iko|khm|m21"
     non_standard_sets = table[
         (~table["cardId"].str.contains(standard_sets, regex=True))
@@ -262,11 +280,14 @@ def check_wrong_sets(table, a_deck_table):
     if non_standard_sets.empty:
         print("All sets are correct.")
     if len(non_standard_sets) == 2 and  (
-        (non_standard_sets
-        .reset_index()["name"]
-        .values
-        .tolist()) == ["Midnight Reaper", "Murder"]
-        ):
+        (
+            non_standard_sets
+            .reset_index()
+            ["name"]
+            .values
+            .tolist()
+        ) == ["Midnight Reaper", "Murder"]
+    ):
         print(
             "All sets are correct, besides the usual"
             "suspects (Midnight Reaper and Murder)."
@@ -281,7 +302,10 @@ def check_wrong_sets(table, a_deck_table):
                 f"The CardId {bad_card_id} needs further"
                 f"investigation - https://www.mtgtop8.com/event{urls_to_check}"
             )
-            new_value = input("Enter the corect values '[new_card_id, 'Name', 'color or empty string']': ")
+            new_value = input(
+                "Enter the corect values "
+                "'[new_card_id, 'Name', 'color or empty string']': "
+            )
             new_data["id_spec_map"].update({bad_card_id: new_value})
 
 def main():
@@ -362,7 +386,7 @@ def main():
         )
 
     logging.info("All tables saved")
-    
+
     update_json_data(new_data)
 
 if __name__ == "__main__":
