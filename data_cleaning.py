@@ -302,9 +302,9 @@ def check_wrong_sets(table, a_deck_table):
                 f"The CardId {bad_card_id} needs further"
                 f"investigation - https://www.mtgtop8.com/event{urls_to_check}"
             )
-            new_value = input(
+            new_value = eval(input(
                 "Enter the corect values "
-                "'[new_card_id, 'Name', 'color or empty string']': "
+                "['new_card_id', 'Name', 'color or empty string']: ")
             )
             new_data["id_spec_map"].update({bad_card_id: new_value})
 
