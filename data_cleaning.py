@@ -1,6 +1,8 @@
 """
 Download and clean known bad data points for MTG standard tournament
 scene inspection
+
+This is a test with git in vim...
 """
 
 import json
@@ -85,7 +87,11 @@ def set_archetypes(table, archetype_map, **kwargs):
     the id, or specifc name.
     """
 
+    # Loops one more time for each item in archetype map
+    # O(n)
     for archetype, flags in archetype_map.items():
+        # loops one more time for each item in flags
+        # O(m)
         for flag in flags:
             table.loc[
                 table["name"].str.contains(flag, case=False),
