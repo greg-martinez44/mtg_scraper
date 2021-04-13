@@ -1,10 +1,6 @@
 """
 Download and clean known bad data points for MTG standard tournament
 scene inspection
-
-This is a test with git in vim...
-
-Another test
 """
 
 import json
