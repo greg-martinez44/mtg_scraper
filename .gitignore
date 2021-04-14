@@ -1,0 +1,16 @@
+*.pyc
+*.csv
+*.xlsx
+*.xlsm
+*.pdf
+*.log
+*.png
+*.db
+*.class
+
+
+**/.ipynb_checkpoints
+**/.__pycache__
+**/build
+**/dist
+**/pylint_logs
