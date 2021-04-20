@@ -168,7 +168,7 @@ class SQLDatabase:
                     standardLegality,
                     oracle_text,
                     mana_cost,
-                    image_uris
+                    image_uri
                 )
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """, item
