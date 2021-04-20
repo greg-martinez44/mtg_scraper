@@ -276,7 +276,7 @@ def check_wrong_sets(table, a_deck_table):
     for spot checking.
     """
 
-    standard_sets = "eld|thb|znr|iko|khm|m21"
+    standard_sets = "eld|thb|znr|iko|khm|m21|stx"
     non_standard_sets = table[
         (~table["cardId"].str.contains(standard_sets, regex=True))
         & (table["date"] >= "2020-09-29")
@@ -303,7 +303,7 @@ def check_wrong_sets(table, a_deck_table):
                 a_deck_table["deckId"] == row["deckId"]
             ]["deckUrl"].values[0]
             print(
-                f"The CardId {bad_card_id} needs further"
+                f"The CardId {bad_card_id} needs further "
                 f"investigation - https://www.mtgtop8.com/event{urls_to_check}"
             )
             new_value = eval(input(

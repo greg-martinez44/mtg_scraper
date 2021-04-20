@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS pilot (
     lastName TEXT DEFAULT "",
 	UNIQUE(firstName, lastName)
 );
+
 CREATE TABLE IF NOT EXISTS card (
     setNumber TEXT NOT NULL,
     setName TEXT NOT NULL,
@@ -20,6 +21,7 @@ CREATE TABLE IF NOT EXISTS card (
     mana_cost TEXT,
     standardLegality TEXT,
     oracle_text TEXT,
+    image_uri TEXT,
     PRIMARY KEY(setNumber, setName)
 );
 CREATE TABLE IF NOT EXISTS deck (

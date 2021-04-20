@@ -318,7 +318,7 @@ SETS = [
     "mbs", "mh1", "mrd", "ogw", "ori",
     "rav", "rix", "roe", "rtr", "sha",
     "soi", "som", "ths", "tsp", "xln",
-    "zen", "kld", "khm"
+    "zen", "kld", "khm", "stx"
 ]
 
 FLAT_FILE_DIR = "/Users/gregmartinez/projects/mtg_scraper/flat_files"

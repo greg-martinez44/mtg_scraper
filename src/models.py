@@ -317,7 +317,13 @@ class CardScraper(PageScraper):
                         if mana_cost == " // ":
                             mana_cost = ""
 
-                    this_card += (oracle_text, mana_cost)
+                    try:
+                        image_uri = card["image_uris"]["normal"]
+                    except KeyError:
+                        image_uri = [face["image_uris"]["normal"] for face in card["card_faces"]]
+
+
+                    this_card += (oracle_text, mana_cost, image_uri)
                     card_table.append(this_card)
 
         return card_table

@@ -167,8 +167,10 @@ class SQLDatabase:
                     color,
                     standardLegality,
                     oracle_text,
-                    mana_cost)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                    mana_cost,
+                    image_uris
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """, item
                 )
         except sqlite3.IntegrityError:
