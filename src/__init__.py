@@ -1,1 +1,1 @@
-from src.constants import ZENDIKAR_RELEASE
+from sqldb import SQLDatabase

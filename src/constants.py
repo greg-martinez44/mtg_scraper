@@ -322,9 +322,9 @@ SETS = [
     "zen", "kld", "khm", "stx"
 ]
 
-FLAT_FILE_DIR = "/Users/gregmartinez/projects/mtg_scraper/flat_files"
+FLAT_FILE_DIR = "../flat_files"
 
 if __name__ == "__main__":
-    with open("/Users/gregmartinez/projects/mtg_scraper/src/data/maps.json", "w") as json_file:
+    with open("data/maps.json", "w") as json_file:
         json.dump(data_maps, json_file)
 

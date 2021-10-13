@@ -5,6 +5,7 @@ scene inspection
 
 import json
 import logging
+import os
 import pandas as pd
 
 from src.constants import (
@@ -33,14 +34,14 @@ new_data = {
     }
 
 def load_json_data():
-    with open("/Users/gregmartinez/projects/mtg_scraper/src/data/maps.json", "r") as json_file:
+    with open("src/data/maps.json", "r") as json_file:
         out = json.load(json_file)
     return out
 
 def update_json_data(new_data):
     """Updates json file with new spot fixes for oddly defined decks"""
 
-    with open("/Users/gregmartinez/projects/mtg_scraper/src/data/maps.json", "r") as json_file:
+    with open("src/data/maps.json", "r") as json_file:
         current_data = json.load(json_file)
 
     current_data["archetype_maps"]["id_map"].update(new_data["archetype_maps"]["id_map"])
@@ -48,7 +49,7 @@ def update_json_data(new_data):
     current_data["broken_code_map"].update(new_data["broken_code_map"])
     current_data["id_spec_map"].update(new_data["id_spec_map"])
 
-    with open("/Users/gregmartinez/projects/mtg_scraper/src/data/maps.json", "w") as json_file:
+    with open("src/data/maps.json", "w") as json_file:
         json.dump(current_data, json_file)
 
 def update(url):
@@ -214,6 +215,8 @@ def fix_wrong_names(table, id_specs_map):
 def save_to_disk(**kwargs):
     """Saves all tables to separate csv files"""
 
+    if not os.path.exists("flat_files"):
+        os.mkdir("flat_files")
     for table in kwargs:
         kwargs[table].to_csv(f"flat_files/{table}.csv", index=False)
 
