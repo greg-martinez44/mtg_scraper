@@ -3,6 +3,7 @@ URL = "https://www.mtgtop8.com/format?f=ST"
 
 ZENDIKAR_RELEASE = "2020-09-25"
 KALDHEIM_RELEASE = "2021-02-05"
+STRIXHAVEN_RELEASE = "2021-04-23"
 
 data_maps = {
     "id_names": {

@@ -11,6 +11,7 @@ from src.constants import (
     URL,
     ZENDIKAR_RELEASE,
     KALDHEIM_RELEASE,
+    STRIXHAVEN_RELEASE,
     FULL_TABLE_COLUMNS
     )
 import src.models as m
@@ -143,7 +144,12 @@ def set_latest_release(table):
         & (table["date"] < KALDHEIM_RELEASE),
         "latest_set"
     ] = "Zendikar Rising"
-    table.loc[table["date"] >= KALDHEIM_RELEASE, "latest_set"] = "Kaldheim"
+    table.loc[
+        (table["date"] >= KALDHEIM_RELEASE)
+        & (table["date"] < STRIXHAVEN_RELEASE),
+        "latest_set"
+    ] = "Kaldheim"
+    table.loc[table["date"] >= STRIXHAVEN_RELEASE, "latest_set"] = "Strixhaven"
 
 def fix_rankings(table, ranking_map, composite_ranks=None):
     """Replaces point systems with rough approximations of the player's rank."""

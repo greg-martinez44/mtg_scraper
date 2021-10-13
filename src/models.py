@@ -203,11 +203,12 @@ class EventScraper(PageScraper):
             while next_page and not up_to_date:
                 print("Updating next page...")
                 page += 1
+                #TODO: Change this to find href of final href in navigation string.
                 scraper.execute("PageSubmit", page)
                 time.sleep(2)
                 result.extend(get_page(scraper))
                 time.sleep(2)
-                next_page = "Nav_PN_no" not in str(scraper)
+                next_page = "Nav_PN_no>Prev" not in str(scraper)
                 up_to_date = self.check_previous(result)
             return result
 
