@@ -154,17 +154,5 @@ class TestRepr(unittest.TestCase):
             print(scraper)
 
 
-unittest.skip("Integration Tests")
-class TestUpdater(unittest.TestCase):
-
-    def test_new_method_works(self):
-        updater = m.Updater()
-        updater.update_events(URL)
-
-    def test_new_deck_update(self):
-        updater = m.Updater()
-        updater.update_decks_and_players()
-
-
 if __name__ == "__main__":
     unittest.main()
