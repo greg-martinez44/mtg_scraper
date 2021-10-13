@@ -3,7 +3,6 @@ import sqlite3
 import time
 
 from src import models as m
-from src.sqldb import SQLDatabase
 
 URL = "https://www.mtgtop8.com/format?f=ST"
 
