@@ -144,3 +144,6 @@ geckodriver.log
 
 **/pylint_logs
 *.pdf
+
+
+**old_stuf/
